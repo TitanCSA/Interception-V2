@@ -1,0 +1,7 @@
+/private/
+/obj/
+/bin/
+/build/
+*.user
+*.suo
+.vs/

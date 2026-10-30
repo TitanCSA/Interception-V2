@@ -1,0 +1,17 @@
+INTERCEPTION V2 - DRIVER DEMO TERMS
+
+Copyright (c) 2026 TitanCSA. All rights reserved to the extent applicable.
+
+Permission is granted to install and evaluate the Interception V2 driver
+binaries as distributed, subject to the built-in one-hour-per-boot demo limit.
+This evaluation grant does not license the separate unrestricted edition or
+authorize removal of the demo restriction. Contact titancsa on Discord for
+unrestricted licensing.
+
+These terms apply only to the independent V2 driver binaries and installer,
+not to upstream Interception library, sample, or tool source. Those files
+retain their original licenses and copyrights. Nothing here overrides rights
+granted by those licenses or rights that applicable law does not allow waived.
+
+The software is provided AS IS without warranties, to the extent permitted by
+applicable law. The user is responsible for authorized and lawful use.
