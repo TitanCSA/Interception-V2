@@ -10,9 +10,9 @@ Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard
 
 Windows 10 version 1709 or later and Windows 11, **x64**. Applications can be 32-bit or 64-bit. Supported sources are HID keyboard and mouse devices handled by the Interceptor keyboard/mouse backend, including compatible USB and Bluetooth HID devices. PS/2 and arbitrary vendor-specific input protocols are not covered.
 
-The initial Microsoft signing submission is being prepared. The complete installer download will be published after the signed package is imported and verified. The SDK and sample sources can already be built from this repository.
+[Download Interception-V2.zip](https://github.com/TitanCSA/Interception-V2/releases/latest/download/Interception-V2.zip) - Microsoft-signed driver, self-contained command line installer, x86/x64 SDK and all seven compiled sample programs with their source.
 
-Once the signed package is available:
+The kernel driver is signed by **Microsoft Windows Hardware Compatibility Publisher**. Test signing is not required.
 
 1. Uninstall the original Interception driver, or another Interceptor keyboard/mouse edition, and restart Windows. These editions must not share the same input devices or legacy endpoint names.
 2. Extract the Interception V2 ZIP and open **Command Prompt as administrator**.
@@ -77,10 +77,14 @@ The unchanged original SDK has no V2-specific error or demo-status API. A failed
 | Folder | Contents |
 | --- | --- |
 | `library/` | Original `interception.h`, library implementation and resource/build files |
+| `library/x86/` and `library/x64/` in the release ZIP | Matching `interception.dll` and `interception.lib` |
 | `samples/` | Original sample source projects and shared sample utilities |
+| `samples/x86/` and `samples/x64/` in the release ZIP | All seven compiled examples, with their matching DLL |
 | `tools/` | Original WDK build helpers |
 | `licenses/` | Original Interception license documents and V2 driver demo terms |
 | `command line installer/` in the release ZIP | Self-contained `install-interception.exe` |
+
+The installer contains the signed keyboard/mouse packages, control endpoint and per-boot demo clock, plus its installation and recovery helpers. No separate driver files need to be copied or installed manually. The demo clock is a kernel-only component used to preserve the one-hour budget when the main driver reloads; it remains resident until Windows restarts. Setup restores Windows input drivers and removes its own packages during uninstall, finishing in-use cleanup after a restart when required.
 
 | Sample | Demonstration |
 | --- | --- |
@@ -104,7 +108,7 @@ This builds x86 and x64 DLLs, import libraries and all seven examples into `bin/
 
 ## Attribution and terms
 
-The SDK, original samples and build tools are preserved from [oblitum/Interception, commit 39eecbb](https://github.com/oblitum/Interception/tree/39eecbbc46a52e0402f783b872ef62b0254a896a). Their original copyrights and [license documents](licenses/) remain in force. V2 is an independent project and is not endorsed by Francisco Lopes or Microsoft. Microsoft driver signing, once completed, authenticates the package; it is not a promise of application compatibility.
+The SDK, original samples and build tools are preserved from [oblitum/Interception, commit 39eecbb](https://github.com/oblitum/Interception/tree/39eecbbc46a52e0402f783b872ef62b0254a896a). Their original copyrights and [license documents](licenses/) remain in force. V2 is an independent project and is not endorsed by Francisco Lopes or Microsoft. Microsoft driver signing authenticates the package; it is not a promise of application compatibility.
 
 The separately developed, closed-source V2 driver is a time-limited demo; see [driver terms](licenses/V2-DRIVER-DEMO.txt). These terms do not replace or expand rights to upstream Interception code. Commercial use of upstream assets must comply with their applicable license.
 
