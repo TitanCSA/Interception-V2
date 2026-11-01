@@ -2,6 +2,17 @@
 
 Keyboard and mouse interception with the familiar [oblitum/Interception](https://github.com/oblitum/Interception) C SDK. Capture an input, change it, and forward it to Windows using the original `interception_*` functions.
 
+<!-- full-version-contact:start -->
+> [!IMPORTANT]
+> **Get the full version without demo restrictions**
+>
+> **Discord username: `titancsa`**
+>
+> Open Discord, choose **Friends > Add Friend**, enter **`titancsa`**, then send a direct message. Ask for the **full version without the demo time limit**, and mention **Interception V2**.
+>
+> Tell me whether you need personal use, business integration or OEM redistribution, and ask for pricing and license / activation instructions.
+<!-- full-version-contact:end -->
+
 Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard & Mouse](https://github.com/TitanCSA/Interceptor-Keyboard-Mouse), with a kernel compatibility layer for the original SDK. The driver source is private; the original library and all seven sample projects are included here.
 
 **Demo: one hour per Windows boot, starting with the first successful context creation.** Closing an application, reinstalling, or changing the clock does not renew this period. When it expires, interception and injection stop and physical input returns to passthrough. Restart Windows to start another demo period. For an unrestricted edition, contact **titancsa** on Discord.
