@@ -13,7 +13,7 @@ Keyboard and mouse interception with the familiar [oblitum/Interception](https:/
 > Tell me whether you need personal use, business integration or OEM redistribution, and ask for pricing and license / activation instructions.
 <!-- full-version-contact:end -->
 
-Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard & Mouse](https://github.com/TitanCSA/Interceptor-Keyboard-Mouse), with a kernel compatibility layer for the original SDK. The driver source is private; the original library and all seven sample projects are included here.
+Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard & Mouse](https://github.com/TitanCSA/Interceptor-Keyboard-Mouse), with a kernel compatibility layer for the original SDK. Demo/evaluation driver source is documented in [driver/README.md](driver/README.md); the original library and all seven sample projects are included here.
 
 **Demo: one hour per Windows boot, starting with the first successful context creation.** Closing an application, reinstalling, or changing the clock does not renew this period. When it expires, interception and injection stop and physical input returns to passthrough. Restart Windows to start another demo period. For an unrestricted edition, contact **titancsa** on Discord.
 
@@ -109,6 +109,12 @@ The installer contains the signed keyboard/mouse packages, control endpoint and 
 
 ## Build the SDK and samples
 
+Demo/evaluation driver source is available; see [driver/README.md](driver/README.md) for
+build instructions and separate evaluation-source terms. Those terms apply to
+Titan-authored driver code. Third-party source licenses and existing application/SDK
+licenses remain applicable. Full/commercial implementation and private signing or
+activation material are excluded.
+
 Install Visual Studio 2022 with **Desktop development with C++**, the Windows SDK and CMake, then run:
 
 ```powershell
@@ -121,6 +127,6 @@ This builds x86 and x64 DLLs, import libraries and all seven examples into `bin/
 
 The SDK, original samples and build tools are preserved from [oblitum/Interception, commit 39eecbb](https://github.com/oblitum/Interception/tree/39eecbbc46a52e0402f783b872ef62b0254a896a). Their original copyrights and [license documents](licenses/) remain in force. V2 is an independent project and is not endorsed by Francisco Lopes or Microsoft. Microsoft driver signing authenticates the package; it is not a promise of application compatibility.
 
-The separately developed, closed-source V2 driver is a time-limited demo; see [driver terms](licenses/V2-DRIVER-DEMO.txt). These terms do not replace or expand rights to upstream Interception code. Commercial use of upstream assets must comply with their applicable license.
+The separately developed V2 driver remains a time-limited demo; its source is documented in [driver/README.md](driver/README.md); see [driver terms](licenses/V2-DRIVER-DEMO.txt). These terms do not replace or expand rights to upstream Interception code. Commercial use of upstream assets must comply with their applicable license.
 
 Use the software only on devices you own or are authorized to manage. It is provided as-is, without warranties, to the extent permitted by applicable law. You are responsible for your use; the authors do not authorize unlawful activity or accept responsibility for misuse. Keep a way to restart or recover the machine while testing input interception.

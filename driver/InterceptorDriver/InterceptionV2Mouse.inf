@@ -1,0 +1,38 @@
+[Version]
+Signature="$WINDOWS NT$"
+Class=Mouse
+ClassGuid={4D36E96F-E325-11CE-BFC1-08002BE10318}
+Provider=%Provider%
+CatalogFile=InterceptionV2Mouse.cat
+DriverVer=10/30/2026,2.0.0.0
+PnpLockdown=1
+[Manufacturer]
+%Provider%=Models,NTamd64.10.0...16299
+[Models.NTamd64.10.0...16299]
+%Name%=Mapper,HID_DEVICE_SYSTEM_MOUSE
+[Mapper.NT]
+CopyFiles=Files
+[Mapper.NT.Services]
+AddService=InterceptionV2,2,Service
+[Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%13%\InterceptionV2.sys
+[Mapper.NT.Wdf]
+KmdfService=InterceptionV2,Wdf
+[Wdf]
+KmdfLibraryVersion=1.15
+[DestinationDirs]
+Files=13
+[Files]
+InterceptionV2.sys
+[SourceDisksNames]
+1=%Provider%,,,
+[SourceDisksFiles]
+InterceptionV2.sys=1
+[Strings]
+Provider="TitanCSA Interception V2"
+Name="InterceptionV2 HID Mouse Mapper"
+ServiceName="InterceptionV2"
