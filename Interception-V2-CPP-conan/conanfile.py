@@ -21,6 +21,7 @@ class NativeSDK(ConanFile):
     def package(self):
         CMake(self).install()
     def package_info(self):
+        self.cpp_info.defines = ["INTERCEPTION_STATIC"]
         self.cpp_info.libs = ["TitanInterceptionV2"]
         self.cpp_info.includedirs = ['include', 'include/library']
         self.cpp_info.system_libs = []
