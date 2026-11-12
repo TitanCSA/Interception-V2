@@ -1,0 +1,13 @@
+Interception V2
+
+The library/, samples/ and tools/ directories contain unmodified files from
+oblitum/Interception, commit 39eecbbc46a52e0402f783b872ef62b0254a896a.
+Copyright and license notices of the respective original authors are retained.
+Original licensing materials are under licenses/commercial-usage and
+licenses/non-commercial-usage. No original kernel driver or installer binary
+is redistributed by the source repository.
+
+Interception V2's independent kernel implementation and installer are separate
+from those upstream files. Demo driver source and its source-license notes are documented in [driver/README.md](driver/README.md).
+Original names are used to describe API and installer compatibility; this
+project is not endorsed by the upstream author or Microsoft.

@@ -1,0 +1,9 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <ClCompile><AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)sdk;$(MSBuildThisFileDirectory)sdk\library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories><PreprocessorDefinitions>INTERCEPTION_STATIC;UNICODE;_UNICODE;NOMINMAX;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions><AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions></ClCompile>
+    <Link><AdditionalDependencies>;%(AdditionalDependencies)</AdditionalDependencies></Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)sdk\library\interception.c"><ObjectFileName>$(IntDir)TitanInterceptionV2_%(Filename).obj</ObjectFileName></ClCompile>
+  </ItemGroup>
+</Project>
