@@ -90,6 +90,12 @@
       "name": "InterceptionV2",
       "version": "1.0.0",
       "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "packaging/conda",
+      "language": "Python",
+      "registry": "conda-forge",
+      "distribution": "Source-build recipe; official review and custom channel availability reported separately"
     }
   ],
   "notes": "Registry accounts or community acceptance are separate. No missing language binding is represented as implemented.",
@@ -101,7 +107,7 @@
     "CPP/vcpkg": {
       "status": "published_custom_registry",
       "registry": "https://github.com/TitanCSA/vcpkg-registry",
-      "baseline": "33fd43f72d7137f6ebaac4c1eeab001f66bf3a98",
+      "baseline": "9a706cf6992544778eb26a8b4244e303292f1ce6",
       "port": "interception-v2",
       "microsoft_curated_registry": false,
       "legacy_port": "interception-v2-sdk",
@@ -114,6 +120,8 @@
       "status": "public_recipe_builds_locally",
       "conan_center": false,
       "directory": "Interception-V2-CPP-conan",
+      "local_recipe_consumer_verified": true,
+      "minimum_cppstd": 17,
       "github_directory": "packaging/native"
     },
     "CPP/nuget": {
@@ -122,46 +130,179 @@
       "version": "2.0.0",
       "registry_published": false,
       "consumer_build_verified": true,
-      "documentation_bundled": true
+      "documentation_bundled": true,
+      "publication_on_hold_by_owner": true
     },
     "NET/nuget": {
-      "status": "binding_not_implemented"
+      "status": "built_verified_publication_on_hold_by_owner",
+      "name": "InterceptionV2.SDK",
+      "version": "1.0.0",
+      "directory": "Interception-V2-NET-nuget",
+      "registry_published": false,
+      "documentation_bundled": true,
+      "url": null,
+      "public_consumer_verified": false,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_",
+      "publication_on_hold_by_owner": true
     },
     "Python/pypi": {
-      "status": "binding_not_implemented"
+      "status": "built_fixture_and_production_verified",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-Python-pypi",
+      "registry_published": false,
+      "documentation_bundled": true,
+      "url": null,
+      "public_consumer_verified": false,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "Python/conda-forge": {
-      "status": "binding_not_implemented"
+      "status": "built_tested_requires_source_publication_and_official_review",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-Python-conda-forge",
+      "registry_published": false,
+      "documentation_bundled": true,
+      "url": null,
+      "public_consumer_verified": false,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_",
+      "recipe_format": "v1",
+      "v1_source_build_tests_passed": true,
+      "personal_maintainer_confirmation_required": true,
+      "official_review_status": "v1_recipe_prepared_requires_submission_or_existing_pr_update",
+      "github_directory": "packaging/conda"
     },
     "Rust/cargo": {
-      "status": "binding_not_implemented"
+      "status": "published_install_verified",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-Rust-cargo",
+      "registry_published": true,
+      "documentation_bundled": true,
+      "url": "https://crates.io/crates/interception-v2",
+      "public_consumer_verified": true,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "JavaScript/npm": {
-      "status": "binding_not_implemented"
+      "status": "awaiting_browser_publication_authentication",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-JavaScript-npm",
+      "registry_published": false,
+      "documentation_bundled": true,
+      "url": "https://www.npmjs.com/package/interception-v2",
+      "public_consumer_verified": false,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "Java/maven": {
-      "status": "binding_not_implemented"
+      "status": "published_install_verified",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-Java-maven",
+      "registry_published": true,
+      "documentation_bundled": true,
+      "url": "https://central.sonatype.com/artifact/io.github.titancsa/interception-v2/1.0.0",
+      "public_consumer_verified": true,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_",
+      "coordinates": "io.github.titancsa:interception-v2:1.0.0",
+      "java_package": "titancsa.products.interception_v2"
     },
     "Java/jitpack": {
-      "status": "binding_not_implemented"
+      "status": "published_install_verified",
+      "name": "interception-v2",
+      "version": "java-sdk-v1.0.0",
+      "directory": "Interception-V2-Java-maven",
+      "registry_published": true,
+      "documentation_bundled": true,
+      "url": "https://jitpack.io/#TitanCSA/Interception-V2/java-sdk-v1.0.0",
+      "public_consumer_verified": true,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_",
+      "coordinates": "com.github.TitanCSA:Interception-V2:java-sdk-v1.0.0",
+      "java_package": "titancsa.products.interception_v2"
     },
     "Go/modules": {
-      "status": "binding_not_implemented"
+      "status": "published_install_verified",
+      "name": "interception-v2",
+      "version": "v1.0.0",
+      "directory": "Interception-V2-Go-modules",
+      "registry_published": true,
+      "documentation_bundled": true,
+      "url": "https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0",
+      "public_consumer_verified": true,
+      "module": "github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "Go/pkg-go-dev": {
-      "status": "binding_not_implemented"
+      "status": "indexed_verified",
+      "url": "https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0"
     },
     "PowerShell/gallery": {
-      "status": "binding_not_implemented"
+      "status": "published_install_verified",
+      "name": "InterceptionV2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-PowerShell-gallery",
+      "registry_published": true,
+      "documentation_bundled": true,
+      "url": "https://www.powershellgallery.com/packages/InterceptionV2/1.0.0",
+      "public_consumer_verified": true,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "Dart/pub-dev": {
-      "status": "binding_not_implemented"
+      "status": "built_fixture_and_production_verified",
+      "name": "interception_v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-Dart-pub-dev",
+      "registry_published": false,
+      "documentation_bundled": true,
+      "url": null,
+      "public_consumer_verified": false,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "Ruby/rubygems": {
-      "status": "binding_not_implemented"
+      "status": "published_install_verified",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-Ruby-rubygems",
+      "registry_published": true,
+      "documentation_bundled": true,
+      "url": "https://rubygems.org/gems/interception-v2",
+      "public_consumer_verified": true,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
     },
     "PHP/packagist": {
-      "status": "binding_not_implemented"
+      "status": "composer_source_and_tag_published",
+      "name": "titancsa/interception-v2",
+      "version": "1.0.0",
+      "directory": "Interception-V2-PHP-packagist",
+      "registry_published": false,
+      "documentation_bundled": true,
+      "url": "https://packagist.org/packages/titancsa/interception-v2",
+      "public_consumer_verified": false,
+      "module": "interception_v2",
+      "dll_name": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_",
+      "repository": "https://github.com/TitanCSA/interception-v2-php"
     }
   },
   "coverage_note": "Missing language bindings are explicitly listed. Published GitHub archives are distinct from central registry acceptance. Local organized SDK folders are retained."
