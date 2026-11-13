@@ -3,99 +3,63 @@
   "packages": [
     {
       "directory": "packaging/native",
-      "build_system": "CMake",
-      "registry_recipes": {
-        "vcpkg": "packaging/native/portfile.cmake",
-        "Conan": "packaging/native/conanfile.py",
-        "NuGet": [
-          "packaging/native/TitanCSA.InterceptionV2.Native.nuspec"
-        ]
-      },
-      "distribution": "Shared native source; registry publication is reported separately below"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/packaging/native",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-C-ffi",
-      "distribution": "Native C ABI adapter to the original project SDK",
-      "dll": "InterceptionV2JsonSDK.dll",
-      "api_prefix": "interception_v2_json_"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-C-ffi",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-Python-pypi",
-      "language": "Python",
-      "registry": "pypi",
-      "name": "interception-v2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-Python-pypi",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-Ruby-rubygems",
-      "language": "Ruby",
-      "registry": "rubygems",
-      "name": "interception-v2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-Ruby-rubygems",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-Go-modules",
-      "language": "Go",
-      "registry": "modules",
-      "name": "interception-v2",
-      "version": "v1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-Go-modules",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-Rust-cargo",
-      "language": "Rust",
-      "registry": "cargo",
-      "name": "interception-v2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-Rust-cargo",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-Java-maven",
-      "language": "Java",
-      "registry": "maven",
-      "name": "interception-v2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-Java-maven",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-Dart-pub-dev",
-      "language": "Dart",
-      "registry": "pub-dev",
-      "name": "interception_v2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-Dart-pub-dev",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-JavaScript-npm",
-      "language": "JavaScript",
-      "registry": "npm",
-      "name": "interception-v2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-JavaScript-npm",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-NET-nuget",
-      "language": "NET",
-      "registry": "nuget",
-      "name": "InterceptionV2.SDK",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-NET-nuget",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "Interception-V2-PowerShell-gallery",
-      "language": "PowerShell",
-      "registry": "gallery",
-      "name": "InterceptionV2",
-      "version": "1.0.0",
-      "distribution": "Documented native SDK; registry receipt tracked independently"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/Interception-V2-PowerShell-gallery",
+      "location": "central_sdk_repository"
     },
     {
       "directory": "packaging/conda",
-      "language": "Python",
-      "registry": "conda-forge",
-      "distribution": "Source-build recipe; official review and custom channel availability reported separately"
+      "source_url": "https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/packaging/conda",
+      "location": "central_sdk_repository"
     }
   ],
   "notes": "Registry accounts or community acceptance are separate. No missing language binding is represented as implemented.",
@@ -185,8 +149,7 @@
       "recipe_format": "v1",
       "v1_source_build_tests_passed": true,
       "personal_maintainer_confirmation_required": true,
-      "official_review_status": "v1_recipe_prepared_requires_submission_or_existing_pr_update",
-      "github_directory": "packaging/conda"
+      "official_review_status": "v1_recipe_prepared_requires_submission_or_existing_pr_update"
     },
     "Rust/cargo": {
       "status": "published_install_verified",
@@ -315,5 +278,8 @@
       "repository": "https://github.com/TitanCSA/interception-v2-php"
     }
   },
-  "coverage_note": "Missing language bindings are explicitly listed. Published GitHub archives are distinct from central registry acceptance. Local organized SDK folders are retained."
+  "coverage_note": "SDK source directories moved to central repository. Product source, prior tags and original releases are separate.",
+  "central_sdk_repository": "https://github.com/TitanCSA/sdk-packages",
+  "central_sdk_directory": "projects/Interception-V2",
+  "central_sdk_source_commit": "5da8260cfafc42181dbcca6196868d049f2b3ebb"
 }
