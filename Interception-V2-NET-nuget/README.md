@@ -1,8 +1,6 @@
 # Interception-V2 .NET8 SDK
 
-Package ID `InterceptionV2.SDK`. NuGet upload remains on hold at owner request.
-
-```csharp
+Package ID `InterceptionV2.SDK`. ```csharp
 using var client=new TitanCSA.Products.InterceptionV2.Client();
 string statusJson=client.Call("check", "{\"device\":1}");
 ```
