@@ -1,0 +1,18 @@
+[build-system]
+requires=["setuptools>=77","wheel>=0.43"]
+build-backend="setuptools.build_meta"
+[project]
+name="interception-v2"
+version="1.0.0"
+description="Windows x64 Interception-V2 direct SDK"
+requires-python=">=3.10"
+license="LGPL-3.0-or-later"
+readme="README.md"
+[project.urls]
+Repository="https://github.com/TitanCSA/Interception-V2"
+[tool.setuptools]
+packages=["interception_v2"]
+[tool.setuptools.package-data]
+interception_v2=["*.dll"]
+[tool.setuptools.data-files]
+"share/interception-v2/docs"=["docs/*","LICENSE"]

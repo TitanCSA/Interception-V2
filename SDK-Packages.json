@@ -12,6 +12,76 @@
         ]
       },
       "distribution": "Shared native source; registry publication is reported separately below"
+    },
+    {
+      "directory": "Interception-V2-C-ffi",
+      "distribution": "Native C ABI adapter to the original project SDK",
+      "dll": "InterceptionV2JsonSDK.dll",
+      "api_prefix": "interception_v2_json_"
+    },
+    {
+      "directory": "Interception-V2-Python-pypi",
+      "language": "Python",
+      "registry": "pypi",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-Ruby-rubygems",
+      "language": "Ruby",
+      "registry": "rubygems",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-Go-modules",
+      "language": "Go",
+      "registry": "modules",
+      "name": "interception-v2",
+      "version": "v1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-Rust-cargo",
+      "language": "Rust",
+      "registry": "cargo",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-Java-maven",
+      "language": "Java",
+      "registry": "maven",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-Dart-pub-dev",
+      "language": "Dart",
+      "registry": "pub-dev",
+      "name": "interception_v2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-NET-nuget",
+      "language": "NET",
+      "registry": "nuget",
+      "name": "InterceptionV2.SDK",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
+      "directory": "Interception-V2-PowerShell-gallery",
+      "language": "PowerShell",
+      "registry": "gallery",
+      "name": "InterceptionV2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
     }
   ],
   "notes": "Registry accounts or community acceptance are separate. No missing language binding is represented as implemented.",

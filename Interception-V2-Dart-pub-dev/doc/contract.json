@@ -1,0 +1,1 @@
+[{"operation": "check", "arguments": {"device": 1}, "expected_key": "keyboard", "expected_value": true}]
