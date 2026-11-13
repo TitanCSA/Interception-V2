@@ -68,6 +68,14 @@
       "distribution": "Documented native SDK; registry receipt tracked independently"
     },
     {
+      "directory": "Interception-V2-JavaScript-npm",
+      "language": "JavaScript",
+      "registry": "npm",
+      "name": "interception-v2",
+      "version": "1.0.0",
+      "distribution": "Documented native SDK; registry receipt tracked independently"
+    },
+    {
       "directory": "Interception-V2-NET-nuget",
       "language": "NET",
       "registry": "nuget",
