@@ -131,29 +131,28 @@
       "github_directory": "packaging/native"
     },
     "CPP/nuget": {
-      "status": "account_email_confirmed_requires_matching_trusted_publishing_policy",
+      "status": "published_payload_verified",
       "name": "Interception-V2.Native",
       "version": "2.0.0",
-      "registry_published": false,
-      "consumer_build_verified": true,
+      "url": "https://www.nuget.org/packages/Interception-V2.Native/2.0.0",
+      "public_payload_verified": true,
+      "public_consumer_verified": false,
+      "local_consumer_verified": true,
+      "registry_published": true,
       "documentation_bundled": true,
-      "publication_on_hold_by_owner": false,
-      "nuget_publication_status": "ready_requires_trusted_publishing_policy"
+      "publication_on_hold_by_owner": false
     },
     "NET/nuget": {
-      "status": "built_verified_requires_trusted_publishing_policy",
+      "status": "published_payload_verified",
       "name": "InterceptionV2.SDK",
       "version": "1.0.0",
-      "directory": "Interception-V2-NET-nuget",
-      "registry_published": false,
-      "documentation_bundled": true,
-      "url": null,
+      "url": "https://www.nuget.org/packages/InterceptionV2.SDK/1.0.0",
+      "public_payload_verified": true,
       "public_consumer_verified": false,
-      "module": "interception_v2",
-      "dll_name": "InterceptionV2JsonSDK.dll",
-      "api_prefix": "interception_v2_json_",
-      "publication_on_hold_by_owner": false,
-      "nuget_publication_status": "ready_requires_trusted_publishing_policy"
+      "local_consumer_verified": true,
+      "registry_published": true,
+      "documentation_bundled": true,
+      "publication_on_hold_by_owner": false
     },
     "Python/pypi": {
       "status": "built_fixture_and_production_verified",
@@ -203,13 +202,13 @@
       "api_prefix": "interception_v2_json_"
     },
     "JavaScript/npm": {
-      "status": "registry_publication_requires_action",
+      "status": "stopped_before_submission",
       "name": "interception-v2",
       "version": "1.0.0",
       "directory": "Interception-V2-JavaScript-npm",
       "registry_published": false,
       "documentation_bundled": true,
-      "url": "https://www.npmjs.com/package/interception-v2",
+      "url": null,
       "public_consumer_verified": false,
       "module": "interception_v2",
       "dll_name": "InterceptionV2JsonSDK.dll",

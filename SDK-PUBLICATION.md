@@ -6,12 +6,12 @@ Current source layout and registry coverage. A GitHub download is distinct from 
 | --- | --- | --- |
 | CPP/vcpkg | published_custom_registry | interception-v2 |
 | CPP/conan | published_custom_source_index | [interception-v2](https://github.com/TitanCSA/sdk-packages/tree/089bc73095aa8eda89bacbe10d0b9e58394b0207/conan-index) [Source](packaging/native/) |
-| CPP/nuget | account_email_confirmed_requires_matching_trusted_publishing_policy | Interception-V2.Native |
-| NET/nuget | built_verified_requires_trusted_publishing_policy | InterceptionV2.SDK [Source](Interception-V2-NET-nuget/) |
+| CPP/nuget | published_payload_verified | [Interception-V2.Native](https://www.nuget.org/packages/Interception-V2.Native/2.0.0) |
+| NET/nuget | published_payload_verified | [InterceptionV2.SDK](https://www.nuget.org/packages/InterceptionV2.SDK/1.0.0) |
 | Python/pypi | built_fixture_and_production_verified | interception-v2 [Source](Interception-V2-Python-pypi/) |
 | Python/conda-forge | custom_channel_install_verified_requires_conda_forge_review | [interception-v2](https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel) [Source](packaging/conda/) |
 | Rust/cargo | published_install_verified | [interception-v2](https://crates.io/crates/interception-v2) [Source](Interception-V2-Rust-cargo/) |
-| JavaScript/npm | registry_publication_requires_action | [interception-v2](https://www.npmjs.com/package/interception-v2) [Source](Interception-V2-JavaScript-npm/) |
+| JavaScript/npm | stopped_before_submission | interception-v2 [Source](Interception-V2-JavaScript-npm/) |
 | Java/maven | published_install_verified | [interception-v2](https://central.sonatype.com/artifact/io.github.titancsa/interception-v2/1.0.0) [Source](Interception-V2-Java-maven/) |
 | Java/jitpack | published_install_verified | [interception-v2](https://jitpack.io/#TitanCSA/Interception-V2/java-sdk-v1.0.0) [Source](Interception-V2-Java-maven/) |
 | Go/modules | published_install_verified | [interception-v2](https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0) [Source](Interception-V2-Go-modules/) |
