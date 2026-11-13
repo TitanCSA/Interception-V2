@@ -12,6 +12,7 @@ int Device(const Json& a){Require(a.contains("device"),"Device is required");aut
 Json Invoke(const std::string& op,const Json& a){
 
 if(op=="check"){auto device=Device(a);return {{"valid",true},{"keyboard",bool(interception_is_keyboard(device))},{"mouse",bool(interception_is_mouse(device))}};}
+if(op=="check_stroke"){auto device=Device(a);if(interception_is_keyboard(device))return {{"stroke",EncodeWire(FromWire<InterceptionKeyStroke>(a.at("stroke")))}};return {{"stroke",EncodeWire(FromWire<InterceptionMouseStroke>(a.at("stroke")))}};}
 if(op=="initialize"){Get();return Json::object();}
 if(op=="close"){if(context){interception_destroy_context(context);context=nullptr;}return Json::object();}
 if(op=="get_precedence")return {{"precedence",interception_get_precedence(Get(),Device(a))}};

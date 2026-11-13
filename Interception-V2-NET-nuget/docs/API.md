@@ -1,6 +1,6 @@
 # Interception-V2 operation schema
 
-The unchanged product C++ SDK is called directly. Operations: `check`, `initialize`, `close`, `get_precedence`, `set_precedence`, `get_filter`, `set_filter`, `wait`, `receive`, `send`, `hardware_id`. The dispatch source in `Bridge.cpp` lists exact argument keys and maps every operation to the original public SDK. Protocol structs retain their public-header field names, including case. UInt64 and Int64 fields are decimal strings; fixed arrays accept at most their capacity and omitted fields initialize to zero. Unknown fields and out-of-range values are rejected. SDK validators apply original protocol constraints.
+The unchanged product C++ SDK is called directly. Operations: `check`, `check_stroke`, `initialize`, `close`, `get_precedence`, `set_precedence`, `get_filter`, `set_filter`, `wait`, `receive`, `send`, `hardware_id`. The dispatch source in `Bridge.cpp` lists exact argument keys and maps every operation to the original public SDK. Protocol structs retain their public-header field names, including case. UInt64 and Int64 fields are decimal strings; fixed arrays accept at most their capacity and omitted fields initialize to zero. Unknown fields and out-of-range values are rejected. SDK validators apply original protocol constraints.
 
 Wire types and fields:
 
