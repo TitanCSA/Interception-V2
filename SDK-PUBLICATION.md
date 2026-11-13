@@ -6,24 +6,24 @@ Choisis le paquet a installer. Installe son outil habituel (Node.js/npm, Python/
 
 Les SDK natifs sont destines a Windows x64. Java utilise Java22+ (Kotlin passe par le SDK Java). Flutter utilise le SDK Dart ; le chargement de la DLL doit etre configure dans l application. AutoHotInterceptor .NET utilise .NET Framework4.8.
 
-| Paquet | Registre | Disponibilite | Installation / utilisation |
-| --- | --- | --- | --- |
-| `interception-v2` | vcpkg | Registre TitanCSA disponible (configuration ci-dessous) | `vcpkg install interception-v2:x64-windows` |
-| `interception-v2` | Conan | Registre TitanCSA disponible (configuration ci-dessous) | `conan install --requires=interception-v2/2.0.0 -r titancsa --build=missing -s compiler.cppstd=17` |
-| `Interception-V2.Native` | NuGet | Publie et verifie | `Install-Package Interception-V2.Native -Version 2.0.0` |
-| `InterceptionV2.SDK` | NuGet | Publie et verifie | `dotnet add package InterceptionV2.SDK --version 1.0.0` |
-| `interception_v2` | PyPI | Pas encore disponible / validation en cours | Commande prevue apres publication : `python -m pip install interception-v2==1.0.0` |
-| `interception-v2` | Conda | Canal TitanCSA disponible ; acceptation conda-forge encore en attente | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge interception-v2` |
-| `interception_v2` | crates.io | Publie et verifie | `cargo add interception-v2@1.0.0` |
-| `interception_v2` | npm | Pas encore disponible / validation en cours | Commande prevue apres publication : `npm install interception-v2@1.0.0` |
-| `io.github.titancsa:interception-v2` | Maven Central | Publie et verifie | `io.github.titancsa:interception-v2:1.0.0 (pom.xml / Gradle)` |
-| `com.github.TitanCSA:Interception-V2` | JitPack | Publie et verifie | `com.github.TitanCSA:Interception-V2:java-sdk-v1.0.0 (avec le depot JitPack)` |
-| `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | Go Modules | Publie et verifie | `go get github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
-| `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | pkg.go.dev | Publie et verifie | `Documentation : https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
-| `interception_v2` | PowerShell Gallery | Publie et verifie | `Install-Module InterceptionV2 -RequiredVersion 1.0.0 -Scope CurrentUser` |
-| `interception_v2` | pub.dev | Pas encore disponible / validation en cours | Commande prevue apres publication : `dart pub add interception_v2:1.0.0` |
-| `interception_v2` | RubyGems | Publie et verifie | `gem install interception-v2 -v 1.0.0` |
-| `interception_v2` | Packagist | Pas encore disponible / validation en cours | Commande prevue apres publication : `composer require titancsa/interception-v2:1.0.0` |
+| Registre | Paquet | Installation / utilisation |
+| --- | --- | --- |
+| vcpkg | `interception-v2` | `vcpkg install interception-v2:x64-windows` |
+| Conan | `interception-v2` | `conan install --requires=interception-v2/2.0.0 -r titancsa --build=missing -s compiler.cppstd=17` |
+| NuGet | `Interception-V2.Native` | `Install-Package Interception-V2.Native -Version 2.0.0` |
+| NuGet | `InterceptionV2.SDK` | `dotnet add package InterceptionV2.SDK --version 1.0.0` |
+| PyPI | `interception_v2` | Commande prevue apres publication : `python -m pip install interception-v2==1.0.0` |
+| Conda | `interception-v2` | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge interception-v2` (canal TitanCSA) |
+| crates.io | `interception_v2` | `cargo add interception-v2@1.0.0` |
+| npm | `interception_v2` | Commande prevue apres publication : `npm install interception-v2@1.0.0` |
+| Maven Central | `io.github.titancsa:interception-v2` | `io.github.titancsa:interception-v2:1.0.0 (pom.xml / Gradle)` |
+| JitPack | `com.github.TitanCSA:Interception-V2` | `com.github.TitanCSA:Interception-V2:java-sdk-v1.0.0 (avec le depot JitPack)` |
+| Go Modules | `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | `go get github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
+| pkg.go.dev | `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | `Documentation : https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
+| PowerShell Gallery | `interception_v2` | `Install-Module InterceptionV2 -RequiredVersion 1.0.0 -Scope CurrentUser` |
+| pub.dev | `interception_v2` | Commande prevue apres publication : `dart pub add interception_v2:1.0.0` |
+| RubyGems | `interception_v2` | `gem install interception-v2 -v 1.0.0` |
+| Packagist | `interception_v2` | Commande prevue apres publication : `composer require titancsa/interception-v2:1.0.0` |
 
 ## Configuration vcpkg et Conan
 
