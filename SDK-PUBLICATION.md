@@ -11,7 +11,7 @@ Current source layout and registry coverage. A GitHub download is distinct from 
 | Python/pypi | built_fixture_and_production_verified | interception-v2 [Source](Interception-V2-Python-pypi/) |
 | Python/conda-forge | custom_channel_install_verified_requires_conda_forge_review | [interception-v2](https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel) [Source](packaging/conda/) |
 | Rust/cargo | published_install_verified | [interception-v2](https://crates.io/crates/interception-v2) [Source](Interception-V2-Rust-cargo/) |
-| JavaScript/npm | awaiting_browser_publication_authentication | [interception-v2](https://www.npmjs.com/package/interception-v2) [Source](Interception-V2-JavaScript-npm/) |
+| JavaScript/npm | registry_publication_requires_action | [interception-v2](https://www.npmjs.com/package/interception-v2) [Source](Interception-V2-JavaScript-npm/) |
 | Java/maven | published_install_verified | [interception-v2](https://central.sonatype.com/artifact/io.github.titancsa/interception-v2/1.0.0) [Source](Interception-V2-Java-maven/) |
 | Java/jitpack | published_install_verified | [interception-v2](https://jitpack.io/#TitanCSA/Interception-V2/java-sdk-v1.0.0) [Source](Interception-V2-Java-maven/) |
 | Go/modules | published_install_verified | [interception-v2](https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0) [Source](Interception-V2-Go-modules/) |
