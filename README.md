@@ -132,28 +132,28 @@ The separately developed V2 driver remains a time-limited demo; its source is do
 Use the software only on devices you own or are authorized to manage. It is provided as-is, without warranties, to the extent permitted by applicable law. You are responsible for your use; the authors do not authorize unlawful activity or accept responsibility for misuse. Keep a way to restart or recover the machine while testing input interception.
 
 <!-- central-sdk-packages:start -->
-## SDK : langages et installation
+## Paquets et installation
 
-Les sources, licences, guides API et exemples sont regroupes dans [le depot SDK dedie](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2). Choisis le langage de ton application puis execute sa commande dans son dossier.
+Les sources, licences, guides API et exemples sont regroupes dans [le depot SDK dedie](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2). Choisis le paquet a installer puis execute sa commande dans son dossier.
 
-| Langage / registre | Disponibilite | Installation / utilisation |
-| --- | --- | --- |
-| C++ / vcpkg | Registre TitanCSA disponible (configuration ci-dessous) | `vcpkg install interception-v2:x64-windows` |
-| C++ / Conan | Registre TitanCSA disponible (configuration ci-dessous) | `conan install --requires=interception-v2/2.0.0 -r titancsa --build=missing -s compiler.cppstd=17` |
-| C++ / NuGet natif | Publie et verifie | `Install-Package Interception-V2.Native -Version 2.0.0` |
-| C# / .NET | Publie et verifie | `dotnet add package InterceptionV2.SDK --version 1.0.0` |
-| Python / pip | Pas encore disponible / validation en cours | Commande prevue apres publication : `python -m pip install interception-v2==1.0.0` |
-| Python / Conda | Canal TitanCSA disponible ; acceptation conda-forge encore en attente | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge interception-v2` |
-| Rust / Cargo | Publie et verifie | `cargo add interception-v2@1.0.0` |
-| JavaScript et TypeScript / npm | Pas encore disponible / validation en cours | Commande prevue apres publication : `npm install interception-v2@1.0.0` |
-| Java et Kotlin / Maven Central | Publie et verifie | `io.github.titancsa:interception-v2:1.0.0 (pom.xml / Gradle)` |
-| Java et Kotlin / JitPack | Publie et verifie | `com.github.TitanCSA:Interception-V2:java-sdk-v1.0.0 (avec le depot JitPack)` |
-| Go / Go Modules | Publie et verifie | `go get github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
-| Go / pkg.go.dev | Publie et verifie | `Documentation : https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
-| PowerShell / Gallery | Publie et verifie | `Install-Module InterceptionV2 -RequiredVersion 1.0.0 -Scope CurrentUser` |
-| Dart et Flutter / pub.dev | Pas encore disponible / validation en cours | Commande prevue apres publication : `dart pub add interception_v2:1.0.0` |
-| Ruby / RubyGems | Publie et verifie | `gem install interception-v2 -v 1.0.0` |
-| PHP / Composer | Pas encore disponible / validation en cours | Commande prevue apres publication : `composer require titancsa/interception-v2:1.0.0` |
+| Paquet | Registre | Disponibilite | Installation / utilisation |
+| --- | --- | --- | --- |
+| `interception-v2` | vcpkg | Registre TitanCSA disponible (configuration ci-dessous) | `vcpkg install interception-v2:x64-windows` |
+| `interception-v2` | Conan | Registre TitanCSA disponible (configuration ci-dessous) | `conan install --requires=interception-v2/2.0.0 -r titancsa --build=missing -s compiler.cppstd=17` |
+| `Interception-V2.Native` | NuGet | Publie et verifie | `Install-Package Interception-V2.Native -Version 2.0.0` |
+| `InterceptionV2.SDK` | NuGet | Publie et verifie | `dotnet add package InterceptionV2.SDK --version 1.0.0` |
+| `interception_v2` | PyPI | Pas encore disponible / validation en cours | Commande prevue apres publication : `python -m pip install interception-v2==1.0.0` |
+| `interception-v2` | Conda | Canal TitanCSA disponible ; acceptation conda-forge encore en attente | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge interception-v2` |
+| `interception_v2` | crates.io | Publie et verifie | `cargo add interception-v2@1.0.0` |
+| `interception_v2` | npm | Pas encore disponible / validation en cours | Commande prevue apres publication : `npm install interception-v2@1.0.0` |
+| `io.github.titancsa:interception-v2` | Maven Central | Publie et verifie | `io.github.titancsa:interception-v2:1.0.0 (pom.xml / Gradle)` |
+| `com.github.TitanCSA:Interception-V2` | JitPack | Publie et verifie | `com.github.TitanCSA:Interception-V2:java-sdk-v1.0.0 (avec le depot JitPack)` |
+| `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | Go Modules | Publie et verifie | `go get github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
+| `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | pkg.go.dev | Publie et verifie | `Documentation : https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
+| `interception_v2` | PowerShell Gallery | Publie et verifie | `Install-Module InterceptionV2 -RequiredVersion 1.0.0 -Scope CurrentUser` |
+| `interception_v2` | pub.dev | Pas encore disponible / validation en cours | Commande prevue apres publication : `dart pub add interception_v2:1.0.0` |
+| `interception_v2` | RubyGems | Publie et verifie | `gem install interception-v2 -v 1.0.0` |
+| `interception_v2` | Packagist | Pas encore disponible / validation en cours | Commande prevue apres publication : `composer require titancsa/interception-v2:1.0.0` |
 
 Pour vcpkg et Conan, configure d abord le registre TitanCSA avec [le guide complet](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/README.md). Le guide explique aussi Maven/Gradle, les prerequis et le chargement des DLL. Les pilotes/applications du produit sont installes separement. Les commandes marquees prevues ne sont pas encore disponibles.
 
