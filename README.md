@@ -6,6 +6,8 @@ Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard
 
 **Demo: one hour per Windows boot, starting with the first successful context creation.** Closing an application, reinstalling, or changing the clock does not renew this period. When it expires, interception and injection stop and physical input returns to passthrough. Restart Windows to start another demo period. For an unrestricted edition, contact **titancsa** on Discord.
 
+[Project overview and compatibility guide](https://titancsa.github.io/projects/interception-v2/)
+
 ## Install
 
 Windows 10 version 1709 or later and Windows 11, **x64**. Applications can be 32-bit or 64-bit. Supported sources are HID keyboard and mouse devices handled by the Interceptor keyboard/mouse backend, including compatible USB and Bluetooth HID devices. PS/2 and arbitrary vendor-specific input protocols are not covered.
