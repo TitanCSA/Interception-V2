@@ -36,6 +36,8 @@ Restart if requested to finish restoring Windows drivers and removing in-use pac
 
 ## Use an existing application
 
+Follow the [migration quickstart](https://titancsa.github.io/guides/interception-v2-migration/) for the signed demo and a C device-inventory sample built with both x86 and x64 SDK libraries.
+
 Keep its original `interception.dll`. V2 implements the device endpoints and IOCTL data layout used by that DLL, including 32-bit applications on 64-bit Windows. Choose the DLL matching your **application's architecture** when building a new application.
 
 The API, header, DLL filename and installer switches retain the original names. Device IDs are **1-10 for keyboards** and **11-20 for mouse devices**. Use `interception_get_hardware_id()` or the `hardwareid` sample to identify a source; do not assume an ID matches a particular USB port across boots.
