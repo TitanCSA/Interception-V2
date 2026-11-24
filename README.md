@@ -152,12 +152,7 @@ Les anciens imports Go et versions JitPack gardent leurs tags. Pour les ancienne
 <!-- central-sdk-packages:end -->
 
 <!-- full-version-contact:start -->
-> [!IMPORTANT]
-> **Get the full version without demo restrictions**
+> **Licensed Release** · [Buy Interception V2 directly](https://licences.configcsa.com/interception-v2).
 >
-> **Discord username: `titancsa`**
->
-> Open Discord, choose **Friends > Add Friend**, enter **`titancsa`**, then send a direct message. Ask for the **full version without the demo time limit**, and mention **Interception V2**.
->
-> Tell me whether you need personal use, business integration or OEM redistribution, and ask for pricing and license / activation instructions.
+> For integration, OEM and support questions, contact `titancsa` on Discord.
 <!-- full-version-contact:end -->
