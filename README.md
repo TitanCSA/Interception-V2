@@ -124,6 +124,8 @@ The installer contains the signed keyboard/mouse packages, control endpoint and 
 
 ## Build the SDK and samples
 
+For a new Visual C++ project, [Interception-V2.Native 2.0.1 on NuGet](https://www.nuget.org/packages/Interception-V2.Native/2.0.1) compiles the original C SDK into your app. The Win32 and x64 consumer checks ran with `/W4 /WX`. For a program that loads `interception.dll`, use the library files in the demo ZIP for that program’s architecture. [Try the first SDK check](https://titancsa.github.io/guides/installer-and-sdk/).
+
 Demo/evaluation driver source is available; see [driver/README.md](driver/README.md) for
 build instructions and separate evaluation-source terms. Those terms apply to
 Titan-authored driver code. Third-party source licenses and existing application/SDK
@@ -155,7 +157,7 @@ Les sources, licences, guides API et exemples sont regroupes dans [le depot SDK 
 | --- | --- | --- |
 | vcpkg | `interception-v2` | `vcpkg install interception-v2:x64-windows` |
 | Conan | `interception-v2` | `conan install --requires=interception-v2/2.0.0 -r titancsa --build=missing -s compiler.cppstd=17` |
-| NuGet | `Interception-V2.Native` | `Install-Package Interception-V2.Native -Version 2.0.0` |
+| NuGet | `Interception-V2.Native` | `Install-Package Interception-V2.Native -Version 2.0.1` |
 | NuGet | `InterceptionV2.SDK` | `dotnet add package InterceptionV2.SDK --version 1.0.0` |
 | PyPI | `interception-v2` | Commande prevue apres publication : `python -m pip install interception-v2==1.0.0` |
 | Conda | `interception-v2` | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge interception-v2` (canal TitanCSA) |
