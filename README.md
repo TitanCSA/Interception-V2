@@ -6,7 +6,7 @@ Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard
 
 **Demo: one hour per Windows boot, starting with the first successful context creation.** Closing an application, reinstalling, or changing the clock does not renew this period. When it expires, interception and injection stop and physical input returns to passthrough. Restart Windows to start another demo period. [Get the licensed Release](https://licences.configcsa.com/interception-v2).
 
-[Project overview and compatibility guide](https://titancsa.github.io/projects/interception-v2/) · [Buy the licensed Release](https://licences.configcsa.com/interception-v2)
+[Project overview and compatibility guide](https://titancsa.github.io/projects/interception-v2/) · [Buy Release · €400 Lifetime](https://licences.configcsa.com/interception-v2)
 
 ## Install
 
