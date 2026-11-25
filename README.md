@@ -124,7 +124,9 @@ The installer contains the signed keyboard/mouse packages, control endpoint and 
 
 ## Build the SDK and samples
 
-For a new Visual C++ project, [Interception-V2.Native 2.0.1 on NuGet](https://www.nuget.org/packages/Interception-V2.Native/2.0.1) compiles the original C SDK into your app. The Win32 and x64 consumer checks ran with `/W4 /WX`. For a program that loads `interception.dll`, use the library files in the demo ZIP for that program’s architecture. [Try the first SDK check](https://titancsa.github.io/guides/installer-and-sdk/).
+**First SDK check.** Extract the [starter ZIP](https://titancsa.github.io/downloads/first-sdk-checks.zip) and run `python scripts/test_first_sdk.py interception-v2 --run` from that folder. It checks the keyboard and mouse ranges in the DLL without opening a driver context. [Tools required](https://titancsa.github.io/guides/installer-and-sdk/).
+
+For a new Visual C++ project, [Interception-V2.Native 2.0.1 on NuGet](https://www.nuget.org/packages/Interception-V2.Native/2.0.1) compiles the original C SDK into your app. The Win32 and x64 consumer checks ran with `/W4 /WX`. For a program that loads `interception.dll`, use the library files in the demo ZIP for that program’s architecture.
 
 Demo/evaluation driver source is available; see [driver/README.md](driver/README.md) for
 build instructions and separate evaluation-source terms. Those terms apply to
