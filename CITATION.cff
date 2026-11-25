@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "Please include the release tag or commit and edition you used when citing this repository."
+title: "Interception V2 compatibility driver"
+type: software
+authors:
+  - name: TitanCSA
+repository-code: https://github.com/TitanCSA/Interception-V2
+url: https://titancsa.github.io/projects/interception-v2/
+abstract: "TitanCSA Windows compatibility driver for the original Interception keyboard and mouse C SDK by Francisco Lopes."
+references:
+  - type: software
+    title: Interception
+    authors:
+      - family-names: Lopes
+        given-names: Francisco
+    repository-code: https://github.com/oblitum/Interception
