@@ -1,4 +1,4 @@
-# Interception V2 - Windows Keyboard and Mouse Kernel Driver
+# Interception V2
 
 <!-- simple-start:start -->
 Keep using a Windows program made for the original Interception keyboard and mouse library.
