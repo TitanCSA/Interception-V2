@@ -3,9 +3,11 @@
 <!-- simple-start:start -->
 Keep using a Windows program made for the original Interception keyboard and mouse library.
 
-**64-bit Windows 10 version 1709 or later, or Windows 11.**
+[First steps](#first-steps) · [Develop](#sdk-and-packages) · [Maintain](https://github.com/TitanCSA/sdk-packages/blob/main/CONTRIBUTING.md)
 
-**Try it**
+## First steps
+
+**64-bit Windows 10 version 1709 or later, or Windows 11.**
 
 1. Download and extract [Interception-V2.zip](https://github.com/TitanCSA/Interception-V2/releases/download/v2.0.0/Interception-V2.zip).
 2. Follow [the installation steps](#install). Remove an older Interception driver before installing this one.
@@ -151,30 +153,9 @@ The separately developed V2 driver remains a time-limited demo; its source is do
 Use the software only on devices you own or are authorized to manage. It is provided as-is, without warranties, to the extent permitted by applicable law. You are responsible for your use; the authors do not authorize unlawful activity or accept responsibility for misuse. Keep a way to restart or recover the machine while testing input interception.
 
 <!-- central-sdk-packages:start -->
-## Paquets et installation
+<a name="paquets-et-installation"></a>
 
-Les sources, licences, guides API et exemples sont regroupes dans [le depot SDK dedie](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2). Choisis le paquet a installer puis execute sa commande dans son dossier.
+## SDK and packages
 
-| Registre | Paquet | Installation / utilisation |
-| --- | --- | --- |
-| vcpkg | `interception-v2` | `vcpkg install interception-v2:x64-windows` |
-| Conan | `interception-v2` | `conan install --requires=interception-v2/2.0.0 -r titancsa --build=missing -s compiler.cppstd=17` |
-| NuGet | `Interception-V2.Native` | `Install-Package Interception-V2.Native -Version 2.0.1` |
-| NuGet | `InterceptionV2.SDK` | `dotnet add package InterceptionV2.SDK --version 1.0.0` |
-| PyPI | `interception-v2` | Commande prevue apres publication : `python -m pip install interception-v2==1.0.0` |
-| Conda | `interception-v2` | `conda install --override-channels -c https://raw.githubusercontent.com/TitanCSA/sdk-packages/089bc73095aa8eda89bacbe10d0b9e58394b0207/conda-channel -c conda-forge interception-v2` (canal TitanCSA) |
-| crates.io | `interception-v2` | `cargo add interception-v2@1.0.0` |
-| npm | `interception-v2` | Commande prevue apres publication : `npm install interception-v2@1.0.0` |
-| Maven Central | `io.github.titancsa:interception-v2` | `io.github.titancsa:interception-v2:1.0.0 (pom.xml / Gradle)` |
-| JitPack | `com.github.TitanCSA:Interception-V2` | `com.github.TitanCSA:Interception-V2:java-sdk-v1.0.0 (avec le depot JitPack)` |
-| Go Modules | `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | `go get github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
-| pkg.go.dev | `github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules` | `Documentation : https://pkg.go.dev/github.com/TitanCSA/Interception-V2/Interception-V2-Go-modules@v1.0.0` |
-| PowerShell Gallery | `InterceptionV2` | `Install-Module InterceptionV2 -RequiredVersion 1.0.0 -Scope CurrentUser` |
-| pub.dev | `interception_v2` | Commande prevue apres publication : `dart pub add interception_v2:1.0.0` |
-| RubyGems | `interception-v2` | `gem install interception-v2 -v 1.0.0` |
-| Packagist | `titancsa/interception-v2` | `composer require titancsa/interception-v2:1.0.0` |
-
-Pour vcpkg et Conan, configure d abord le registre TitanCSA avec [le guide complet](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2/README.md). Le guide explique aussi Maven/Gradle, les prerequis et le chargement des DLL. Les pilotes/applications du produit sont installes separement. Les commandes marquees prevues ne sont pas encore disponibles.
-
-Les anciens imports Go et versions JitPack gardent leurs tags. Pour les anciennes archives SDK, utilise [les liens de remplacement](https://github.com/TitanCSA/sdk-packages/blob/main/release-assets/URL-MIGRATION.json).
+Choose a language in the [SDK and package guide](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2#readme) for exact install commands and examples. If your example requires a driver or app, install it separately.
 <!-- central-sdk-packages:end -->
