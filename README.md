@@ -1,14 +1,26 @@
 # Interception V2 - Windows Keyboard and Mouse Kernel Driver
 
+<!-- simple-start:start -->
+Keep using a Windows program made for the original Interception keyboard and mouse library.
+
+**64-bit Windows 10 version 1709 or later, or Windows 11.**
+
+**Try it**
+
+1. Download and extract [Interception-V2.zip](https://github.com/TitanCSA/Interception-V2/releases/download/v2.0.0/Interception-V2.zip).
+2. Follow [the installation steps](#install). Remove an older Interception driver before installing this one.
+3. Open the program you want to use and check that its keyboard or mouse works.
+<!-- simple-start:end -->
+
 <!-- full-version-contact:start -->
 > [!IMPORTANT]
-> **Get the version without the one-hour demo limit**
+> **Version without the one-hour demo limit**
 >
-> **Discord · `titancsa`**. Open [Discord](https://discord.com/app), choose **Friends → Add Friend**, enter **`titancsa`** and send a message.
-> Send the project name and ask for its full version. TitanCSA will share the purchase details privately.
->
-> **FR · Version sans la limite d’une heure.** Ajoute **`titancsa`** sur Discord et envoie le nom du projet. Le lien d’achat est communiqué en privé.
+> In [Discord](https://discord.com/app), choose **Add Friend** and enter **`titancsa`**. Send the project name. Purchase details are sent privately.
 <!-- full-version-contact:end -->
+
+<details>
+<summary>Project details and screenshots</summary>
 
 Keyboard and mouse interception with the familiar [oblitum/Interception](https://github.com/oblitum/Interception) C SDK. Capture an input, change it, and forward it to Windows using the original `interception_*` functions.
 
@@ -16,7 +28,7 @@ Interception V2 uses the keyboard/mouse input backend from [Interceptor Keyboard
 
 **Demo: one hour per Windows boot, starting with the first successful context creation.** Closing an application, reinstalling, or changing the clock does not renew this period. When it expires, interception and injection stop and physical input returns to passthrough. Restart Windows to start another demo period. [Contact titancsa on Discord](https://titancsa.github.io/about/evidence/#release-contact).
 
-[Project overview and compatibility guide](https://titancsa.github.io/projects/interception-v2/) · [Contact titancsa on Discord](https://titancsa.github.io/about/evidence/#release-contact)
+</details>
 
 ## Install
 
@@ -162,5 +174,3 @@ Pour vcpkg et Conan, configure d abord le registre TitanCSA avec [le guide compl
 
 Les anciens imports Go et versions JitPack gardent leurs tags. Pour les anciennes archives SDK, utilise [les liens de remplacement](https://github.com/TitanCSA/sdk-packages/blob/main/release-assets/URL-MIGRATION.json).
 <!-- central-sdk-packages:end -->
-
-
