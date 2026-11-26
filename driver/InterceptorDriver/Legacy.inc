@@ -35,7 +35,7 @@ static BOOLEAN LegacySameInstance(const USHORT* a,const USHORT* b) {
 }
 static void LegacyBindLocked(DEVICE_CONTEXT* d) {
     ULONG i,start=d->keyboard?0:10,empty=IV2_LEGACY_SLOTS;
-    if(d->stop || !d->readerReady || !d->connection.ClassService)return;
+    if(d->stop || !d->thread || !d->connection.ClassService)return;
     for(i=start;i<start+10;++i) {
         LEGACY_SLOT* slot=&legacySlots[i];
         if(slot->target==d)return;
@@ -165,7 +165,7 @@ static NTSTATUS LegacyWriteLocked(LEGACY_FILE* f,PVOID input,SIZE_T size,SIZE_T*
     if(!size || size%unit || size/unit>8192)return STATUS_INVALID_BUFFER_SIZE;
     status=IcTrialSendAccessLocked();if(!NT_SUCCESS(status))return status;
     if(!NT_SUCCESS(f->revoked))return f->revoked;
-    if(!slot->target || slot->target->stop || !slot->target->readerReady || !slot->target->connection.ClassService)return STATUS_DEVICE_NOT_CONNECTED;
+    if(!slot->target || slot->target->stop || !slot->target->thread || !slot->target->connection.ClassService)return STATUS_DEVICE_NOT_CONNECTED;
     count=(ULONG)(size/unit);
     for(i=0;i<count;++i) {
         if(keyboard){KEYBOARD_INPUT_DATA* k=(KEYBOARD_INPUT_DATA*)input+i;if(k->Reserved || k->MakeCode>255 || (k->Flags&~0x3fu) || (k->Flags&6u)==6u)return STATUS_INVALID_PARAMETER;}
@@ -213,7 +213,7 @@ void LegacyIoctl(WDFQUEUE queue,WDFREQUEST request,SIZE_T outputLength,SIZE_T in
     }else if(code==IV2_IOCTL(0x880)) {
         DEVICE_CONTEXT* target=legacySlots[f->slot].target;
         if(inputLength)status=STATUS_INVALID_BUFFER_SIZE;
-        else if(!target || target->stop || !target->readerReady)status=STATUS_DEVICE_NOT_CONNECTED;
+        else if(!target || target->stop)status=STATUS_DEVICE_NOT_CONNECTED;
         else {ULONG n=0;while(n<255 && target->info.hardware_id[n])++n;written=(n+1)*sizeof(USHORT);if(outputLength<written){written=0;status=STATUS_BUFFER_TOO_SMALL;}else{RtlCopyMemory(output,target->info.hardware_id,written);status=STATUS_SUCCESS;}}
     }else if(code==IV2_IOCTL(0x840)) {
         SIZE_T unit=f->slot<10?sizeof(KEYBOARD_INPUT_DATA):sizeof(MOUSE_INPUT_DATA);ULONG count,i;

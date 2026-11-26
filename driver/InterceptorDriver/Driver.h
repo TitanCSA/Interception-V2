@@ -32,18 +32,16 @@ typedef struct DEVICE_CONTEXT {
     WDFREQUEST readRequest;
     WDFMEMORY readMemory;
     KEVENT readDone;
-    KEVENT readerStarted; // Wait until the creator publishes the worker reference.
     KEVENT stopEvent;
     KEVENT maintenanceEvent;
-    volatile LONG readStatus;
-    NTSTATUS completionStatus;
+    NTSTATUS readStatus;
     ULONG_PTR readBytes;
     BOOLEAN readUsed;
     PFILE_OBJECT hidFile;
     PHIDP_VALUE_CAPS values;
     USHORT valueCount;
     // Descriptor index + 1, by report ID and X/Y/wheel/horizontal wheel.
-    // Zero means absent. Rebuilt by the reader when the HID transport recovers.
+    // Zero means absent. Built once in PrepareHardware, immutable while reading.
     USHORT axisCaps[256][4];
     PUCHAR keyReports;
     USHORT keyCounts[256];
@@ -54,12 +52,9 @@ typedef struct DEVICE_CONTEXT {
     LONG absoluteX,absoluteY;
     USAGE repeatUsage;
     ULONGLONG repeatAt;
-    volatile LONG indicators,indicatorDirty;
+    USHORT indicators;
     KEYBOARD_TYPEMATIC_PARAMETERS typematic;
     PETHREAD thread;
-    WDFTIMER retryTimer;
-    BOOLEAN powered,readerReady;
-    BOOLEAN flipWheel,flipHorizontal,forceAbsolute;
     volatile LONG stop;
     CONNECT_DATA connection;
     ULONG id;
@@ -86,8 +81,7 @@ void IcPhysicalKeys(DEVICE_CONTEXT* d,const UCHAR current[256]);
 void IcRoute(DEVICE_CONTEXT* d,PVOID first);
 BOOLEAN IcRecovery(DEVICE_CONTEXT* d);
 void IcDeviceStopping(DEVICE_CONTEXT* d);
-void IcDeviceReadyLocked(DEVICE_CONTEXT* d); // Caller holds gGate while publishing reader readiness.
-NTSTATUS FilterInitialize(WDFDEVICE,BOOLEAN);
+void IcDeviceReadyLocked(DEVICE_CONTEXT* d); // Caller holds gGate while publishing thread.
 NTSTATUS FilterPrepare(WDFDEVICE,WDFCMRESLIST,WDFCMRESLIST);
 NTSTATUS FilterRelease(WDFDEVICE,WDFCMRESLIST);
 NTSTATUS FilterStart(WDFDEVICE);

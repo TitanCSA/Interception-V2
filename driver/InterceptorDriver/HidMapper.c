@@ -6,20 +6,15 @@
 #include "../Shared/HidKeyState.h"
 #include "../Shared/MouseReportMode.h"
 // HID mapper adapted from the local ConfigCSASoftwareWebV2 project.
-static SHORT FilterScaleWheel(LONG value,BOOLEAN reverse) {
-    const LONGLONG units=(LONGLONG)value*(reverse?-120:120);
-    return (SHORT)max(-32768,min(32767,units));
-}
+static LONG FilterScaleWheel(LONG value) { LONGLONG v=(LONGLONG)value*120;return (LONG)max(-32768,min(32767,v)); }
 
 
 
 
-static void FilterStartLocked(WDFDEVICE device);
+static NTSTATUS FilterStartLocked(WDFDEVICE device);
 static void FilterStopLocked(WDFDEVICE device);
 static NTSTATUS FilterIndicators(DEVICE_CONTEXT* d,USHORT flags);
 static void FilterRepeat(DEVICE_CONTEXT* d);
-static void FilterReaderReady(DEVICE_CONTEXT* d);
-static void FilterApplyIndicators(DEVICE_CONTEXT* d);
 // CreateLocked counts and publishes its snapshot under gGate. Every change of
 // reader eligibility must use that same gate, including terminal/error paths.
 // Never hold it while creating, cancelling or joining the reader thread.
@@ -58,7 +53,7 @@ static NTSTATUS FilterButtonCaps(PHIDP_PREPARSED_DATA data,ULONG capacity,
 static void FilterReadComplete(WDFREQUEST request,WDFIOTARGET target,PWDF_REQUEST_COMPLETION_PARAMS parameters,WDFCONTEXT context) {
     DEVICE_CONTEXT* d=context;UNREFERENCED_PARAMETER(request);UNREFERENCED_PARAMETER(target);
     
-    d->completionStatus=parameters->IoStatus.Status;d->readBytes=parameters->IoStatus.Information;
+    d->readStatus=parameters->IoStatus.Status;d->readBytes=parameters->IoStatus.Information;
     KeSetEvent(&d->readDone,IO_NO_INCREMENT,FALSE);
 }
 static NTSTATUS FilterRead(DEVICE_CONTEXT* d,ULONG_PTR* bytes) {
@@ -73,7 +68,6 @@ static NTSTATUS FilterRead(DEVICE_CONTEXT* d,ULONG_PTR* bytes) {
     IoGetNextIrpStackLocation(WdfRequestWdmGetIrp(d->readRequest))->FileObject=d->hidFile;
     WdfRequestSetCompletionRoutine(d->readRequest,FilterReadComplete,d);
     if(!WdfRequestSend(d->readRequest,target,NULL))return WdfRequestGetStatus(d->readRequest);
-    FilterReaderReady(d);
     for(;;) {
         PVOID events[3]={&d->stopEvent,&d->readDone,&d->maintenanceEvent};
         LARGE_INTEGER timeout={0};PLARGE_INTEGER due=NULL;
@@ -97,9 +91,9 @@ static NTSTATUS FilterRead(DEVICE_CONTEXT* d,ULONG_PTR* bytes) {
             return STATUS_CANCELLED;
         }
         if(status==STATUS_WAIT_1)break;
-        if(d->keyboard && !d->stop) {FilterApplyIndicators(d);FilterRepeat(d);}
+        if(d->keyboard && !d->stop)FilterRepeat(d);
     }
-    *bytes=d->readBytes;return d->completionStatus;
+    *bytes=d->readBytes;return d->readStatus;
 }
 
 static void FilterCloseHid(DEVICE_CONTEXT* d) {
@@ -142,7 +136,15 @@ void FilterHidCreate(WDFDEVICE device,WDFREQUEST request,WDFFILEOBJECT file) {
     
     if(NT_SUCCESS(status) && (access&(FILE_READ_DATA|GENERIC_READ)) && !d->hidFile) {
         d->hidFile=wdm;
-        FilterStartLocked(device);
+        // Best effort, once per borrowed open; never turn a successful lower
+        // CREATE into a failure or prevent input if the reserve cannot grow.
+        (void)FilterReserveInputBuffers(d->device,d->hidFile);
+        // HIDClass has accepted CREATE. Completing it with a new failure would
+        // skip CLEANUP/CLOSE for the lower driver's successful file context.
+        // Keep the borrowed file until cleanup even if starting the reader
+        // fails; readiness excludes a stopped/missing reader and restart retries.
+        if(d->keyboard)FilterIndicators(d,d->indicators);
+        (void)FilterStartLocked(device);
     }
     WdfWaitLockRelease(d->stateLock);
     WdfRequestComplete(request,status);
@@ -171,44 +173,10 @@ static void FilterCacheMouseModes(DEVICE_CONTEXT* d) {
             y!=0,y?d->values[y-1].IsAbsolute:FALSE);
     }
 }
-static void FilterFreeReader(DEVICE_CONTEXT* d) {
-    if(d->readRequest) {WdfObjectDelete(d->readRequest);d->readRequest=NULL;d->readMemory=NULL;}
-    if(d->values) {ExFreePoolWithTag(d->values,FILTER_TAG);d->values=NULL;d->valueCount=0;}
-    if(d->keyReports) {ExFreePoolWithTag(d->keyReports,FILTER_TAG);d->keyReports=NULL;}
-    if(d->report) {ExFreePoolWithTag(d->report,FILTER_TAG);d->report=NULL;}
-    if(d->preparsed) {ExFreePoolWithTag(d->preparsed,FILTER_TAG);d->preparsed=NULL;}
-}
-
-static BOOLEAN FilterRetry(DEVICE_CONTEXT* d,ULONG milliseconds) {
-    LARGE_INTEGER delay;
-    delay.QuadPart=-(LONGLONG)milliseconds*10000;
-    return KeWaitForSingleObject(&d->stopEvent,Executive,KernelMode,FALSE,&delay)==STATUS_WAIT_0;
-}
-
-static ULONG FilterReadSetting(WDFKEY key,PCWSTR name) {
-    UNICODE_STRING value;
-    ULONG number=0;
-    RtlInitUnicodeString(&value,name);
-    if(!NT_SUCCESS(WdfRegistryQueryULong(key,&value,&number)))return 0;
-    return number;
-}
-
-static void FilterReadMouseSettings(DEVICE_CONTEXT* d) {
-    WDFKEY key;
-    d->flipWheel=d->flipHorizontal=d->forceAbsolute=FALSE;
-    if(!NT_SUCCESS(WdfDeviceOpenRegistryKey(d->device,PLUGPLAY_REGKEY_DEVICE,
-        KEY_QUERY_VALUE,WDF_NO_OBJECT_ATTRIBUTES,&key)))return;
-    d->flipWheel=FilterReadSetting(key,L"FlipFlopWheel")!=0;
-    d->flipHorizontal=FilterReadSetting(key,L"FlipFlopHScroll")!=0;
-    d->forceAbsolute=FilterReadSetting(key,L"ForceAbsolute")!=0;
-    WdfRegistryClose(key);
-}
-
-static NTSTATUS FilterPrepareReader(WDFDEVICE device) {
+NTSTATUS FilterPrepare(WDFDEVICE device, WDFCMRESLIST raw, WDFCMRESLIST translated) {
     DEVICE_CONTEXT* d = FilterDevice(device); HID_COLLECTION_INFORMATION info;
     NTSTATUS status;
-    IC_DEVICE_INFO identity={0};
-    if(!d->keyboard)FilterReadMouseSettings(d);
+    UNREFERENCED_PARAMETER(raw); UNREFERENCED_PARAMETER(translated);
     d->absoluteX=d->absoluteY=0;d->prefix=0;d->modifiers.ul=0;
     RtlZeroMemory(d->mouseModes,sizeof(d->mouseModes));
     RtlZeroMemory(d->axisCaps,sizeof(d->axisCaps));
@@ -217,17 +185,18 @@ static NTSTATUS FilterPrepareReader(WDFDEVICE device) {
     status = FilterHidIoctl(device, IOCTL_HID_GET_COLLECTION_INFORMATION, &info, sizeof(info));
     if (!NT_SUCCESS(status)) return IcPrepareStatus(status);
     if (!info.DescriptorSize || info.DescriptorSize > IC_MAPPER_DESCRIPTOR_MAX) return STATUS_INVALID_BUFFER_SIZE;
-    identity.vid=info.VendorID;identity.pid=info.ProductID;identity.revision=info.VersionNumber;
-    identity.flags=IC_INFO_HID_VALID;identity.instance_token=d->id;
+    RtlZeroMemory(&d->info,sizeof(d->info));
+    d->info.vid=info.VendorID;d->info.pid=info.ProductID;d->info.revision=info.VersionNumber;
+    d->info.flags=IC_INFO_HID_VALID;d->info.instance_token=d->id;
     {
         ULONG bytes=0;
-        if(NT_SUCCESS(WdfDeviceQueryProperty(device,DevicePropertyHardwareID,sizeof(identity.hardware_id)-sizeof(USHORT),identity.hardware_id,&bytes)))
-            identity.flags|=IC_INFO_HARDWARE_ID_VALID;
-        else RtlZeroMemory(identity.hardware_id,sizeof(identity.hardware_id));
-        status=WdfDeviceQueryProperty(device,DevicePropertyFriendlyName,sizeof(identity.name)-sizeof(USHORT),identity.name,&bytes);
-        if(!NT_SUCCESS(status))status=WdfDeviceQueryProperty(device,DevicePropertyDeviceDescription,sizeof(identity.name)-sizeof(USHORT),identity.name,&bytes);
-        if(NT_SUCCESS(status))identity.flags|=IC_INFO_NAME_VALID;
-        else RtlZeroMemory(identity.name,sizeof(identity.name));
+        if(NT_SUCCESS(WdfDeviceQueryProperty(device,DevicePropertyHardwareID,sizeof(d->info.hardware_id)-sizeof(USHORT),d->info.hardware_id,&bytes)))
+            d->info.flags|=IC_INFO_HARDWARE_ID_VALID;
+        else RtlZeroMemory(d->info.hardware_id,sizeof(d->info.hardware_id));
+        status=WdfDeviceQueryProperty(device,DevicePropertyFriendlyName,sizeof(d->info.name)-sizeof(USHORT),d->info.name,&bytes);
+        if(!NT_SUCCESS(status))status=WdfDeviceQueryProperty(device,DevicePropertyDeviceDescription,sizeof(d->info.name)-sizeof(USHORT),d->info.name,&bytes);
+        if(NT_SUCCESS(status))d->info.flags|=IC_INFO_NAME_VALID;
+        else RtlZeroMemory(d->info.name,sizeof(d->info.name));
     }
     d->preparsed = ExAllocatePoolZero(NonPagedPoolNx, info.DescriptorSize, FILTER_TAG);
     if (!d->preparsed) return STATUS_INSUFFICIENT_RESOURCES;
@@ -239,10 +208,11 @@ static NTSTATUS FilterPrepareReader(WDFDEVICE device) {
         d->caps.InputReportByteLength,d->caps.NumberInputValueCaps,0)!=IC_MAPPER_PROFILE_OK) {
         status = STATUS_DEVICE_CONFIGURATION_ERROR; goto fail;
     }
-    if((d->caps.Usage==6)!=d->keyboard) {status=STATUS_DEVICE_CONFIGURATION_ERROR;goto fail;}
-    identity.type=d->keyboard?IC_TYPE_KEYBOARD:IC_TYPE_MOUSE;
-    identity.usage_page=d->caps.UsagePage;identity.usage=d->caps.Usage;
-    identity.input_bytes=d->caps.InputReportByteLength;identity.output_bytes=d->caps.OutputReportByteLength;identity.feature_bytes=d->caps.FeatureReportByteLength;
+    d->keyboard = d->caps.Usage == 6;
+    d->info.type=d->keyboard?IC_TYPE_KEYBOARD:IC_TYPE_MOUSE;
+    d->info.usage_page=d->caps.UsagePage;d->info.usage=d->caps.Usage;
+    d->info.input_bytes=d->caps.InputReportByteLength;d->info.output_bytes=d->caps.OutputReportByteLength;d->info.feature_bytes=d->caps.FeatureReportByteLength;
+    d->typematic.Rate=30; d->typematic.Delay=500;
     d->valueCount=d->caps.NumberInputValueCaps;
     if(d->valueCount) {
         ULONG i;const ULONG capacity=d->valueCount;USHORT count=(USHORT)capacity;
@@ -272,16 +242,19 @@ static NTSTATUS FilterPrepareReader(WDFDEVICE device) {
         status=WdfRequestCreate(&attributes,WdfDeviceGetIoTarget(device),&d->readRequest);if(!NT_SUCCESS(status))goto fail;
         WDF_OBJECT_ATTRIBUTES_INIT(&attributes);attributes.ParentObject=d->readRequest;
         status=WdfMemoryCreatePreallocated(&attributes,d->report,d->caps.InputReportByteLength,&d->readMemory);if(!NT_SUCCESS(status))goto fail;
-        d->readUsed=FALSE;
+        KeInitializeEvent(&d->readDone,SynchronizationEvent,FALSE);d->readUsed=FALSE;
+        KeInitializeEvent(&d->stopEvent,NotificationEvent,FALSE);
+        KeInitializeEvent(&d->maintenanceEvent,SynchronizationEvent,FALSE);
+
     }
-    WdfWaitLockAcquire(gGate,NULL);
-    d->info=identity;
-    WdfWaitLockRelease(gGate);
+    status=IcRegister(d);if(!NT_SUCCESS(status))goto fail;
     return STATUS_SUCCESS;
 fail:
-    FilterFreeReader(d);
-    FilterFailure(status);
-    return IcPrepareStatus(status);
+    if(d->readRequest) { WdfObjectDelete(d->readRequest);d->readRequest=NULL;d->readMemory=NULL; }
+    if(d->report) { ExFreePoolWithTag(d->report,FILTER_TAG);d->report=NULL; }
+    if(d->values) { ExFreePoolWithTag(d->values,FILTER_TAG);d->values=NULL; }
+    if(d->keyReports) { ExFreePoolWithTag(d->keyReports,FILTER_TAG);d->keyReports=NULL; }
+    ExFreePoolWithTag(d->preparsed, FILTER_TAG); d->preparsed = NULL; FilterFailure(status); return IcPrepareStatus(status);
 }
 static void FilterDeliver(DEVICE_CONTEXT* d,PVOID first,PVOID last) { UNREFERENCED_PARAMETER(last);IcRoute(d,first); }
 static BOOLEAN FilterScanCodes(PVOID context, PCHAR codes, ULONG length) {
@@ -346,7 +319,7 @@ static void FilterKeyboard(DEVICE_CONTEXT* d) {
     IcPhysicalKeys(d,current);
     RtlCopyMemory(d->keys,current,sizeof(current));FilterApplyKeys(d);
 }
-static LONG FilterAxis(DEVICE_CONTEXT* d, USAGE page, USAGE usage, BOOLEAN* valid) {
+static LONG FilterAxis(DEVICE_CONTEXT* d, USAGE page, USAGE usage) {
     ULONG axis=page==0x0C?3:usage==0x30?0:usage==0x31?1:2;
     USHORT index=d->axisCaps[d->report[0]][axis];
     if(index) {
@@ -355,13 +328,13 @@ static LONG FilterAxis(DEVICE_CONTEXT* d, USAGE page, USAGE usage, BOOLEAN* vali
         if(status!=HIDP_STATUS_SUCCESS) { FilterFailure(status);return 0; }
         if(cap->LogicalMin<0 && cap->BitSize && cap->BitSize<32 && (raw&(1u<<(cap->BitSize-1))))raw|=(~0u<<cap->BitSize);
         result=(LONG)raw;
-        if((cap->IsAbsolute || d->forceAbsolute) && page==1 && (usage==0x30 || usage==0x31)) {
+        if(cap->IsAbsolute && page==1 && (usage==0x30 || usage==0x31)) {
             LONGLONG range=(LONGLONG)cap->LogicalMax-cap->LogicalMin;
-            if(range<=0 || (cap->HasNull && (result<cap->LogicalMin || result>cap->LogicalMax)))return 0;
+            if(range<=0)return 0;
             result=(LONG)max(0,min(65535,((LONGLONG)result-cap->LogicalMin)*65535/range));
             if(usage==0x30)d->absoluteX=result;else d->absoluteY=result;
+            return result;
         }
-        if(valid)*valid=TRUE;
         return result;
     }
     return 0;
@@ -370,9 +343,7 @@ static void FilterMouse(DEVICE_CONTEXT* d) {
     USAGE usages[32]; ULONG count = RTL_NUMBER_OF(usages), i; UCHAR buttons = 0, mapped;
     MOUSE_INPUT_DATA packet = {0}; LONG x, y, wheel, horizontal; NTSTATUS status;
     const UCHAR mode=d->mouseModes[d->report[0]];
-    BOOLEAN validX=FALSE,validY=FALSE;
-    const BOOLEAN absolute=(mode&IC_MOUSE_REPORT_ABSOLUTE)!=0 ||
-        (d->forceAbsolute && (mode&(IC_MOUSE_REPORT_X|IC_MOUSE_REPORT_Y))!=0);
+    const BOOLEAN absolute=(mode&IC_MOUSE_REPORT_ABSOLUTE)!=0;
     status = HidP_GetUsages(HidP_Input, 9, 0, usages, &count, d->preparsed,
         (PCHAR)d->report, d->caps.InputReportByteLength);
     if(status==HIDP_STATUS_SUCCESS) {
@@ -388,228 +359,103 @@ static void FilterMouse(DEVICE_CONTEXT* d) {
         }
     } else if(status!=HIDP_STATUS_USAGE_NOT_FOUND && status!=HIDP_STATUS_INCOMPATIBLE_REPORT_ID) { FilterFailure(status);return; }
     buttons=d->physicalButtons;
-    x=FilterAxis(d,1,0x30,&validX);
-    y=FilterAxis(d,1,0x31,&validY);
-    wheel=FilterAxis(d,1,0x38,NULL);
-    horizontal=FilterAxis(d,0x0C,0x238,NULL);
+    x = FilterAxis(d,1,0x30); y = FilterAxis(d,1,0x31); wheel = FilterAxis(d,1,0x38); horizontal=FilterAxis(d,0x0C,0x238);
     mapped=buttons;
     for (i = 0; i < 5; ++i) if ((mapped ^ d->buttons) & (1u << i))
         packet.ButtonFlags |= (USHORT)(1u << (2 * i + ((mapped & (1u << i)) ? 0 : 1)));
+    packet.LastX = x; packet.LastY = y;
     if(absolute) {
-        // A null or absent axis must never turn a button-only report into a
-        // move to the origin. Reuse its last position only on real movement.
-        if(validX || validY) {
-            packet.Flags=MOUSE_MOVE_ABSOLUTE|MOUSE_VIRTUAL_DESKTOP;
-            packet.LastX=validX?max(0,min(65535,x)):d->absoluteX;
-            packet.LastY=validY?max(0,min(65535,y)):d->absoluteY;
-        }
-    } else {
-        packet.LastX=x;
-        packet.LastY=y;
+        // Only an absolute-motion report may reuse a missing absolute axis.
+        // Button/wheel-only reports must not reposition the pointer. Reports
+        // containing mixed absolute/relative axes retain the previous mapping
+        // (IC_MOUSE_REPORT_MIXED); MOUSE_INPUT_DATA cannot encode both modes.
+        if(!(mode&IC_MOUSE_REPORT_X))packet.LastX=d->absoluteX;
+        if(!(mode&IC_MOUSE_REPORT_Y))packet.LastY=d->absoluteY;
+        packet.Flags=MOUSE_MOVE_ABSOLUTE|MOUSE_VIRTUAL_DESKTOP;
+        packet.LastX=max(0,min(65535,packet.LastX));packet.LastY=max(0,min(65535,packet.LastY));
     }
-    if(wheel) {
-        packet.ButtonFlags|=MOUSE_WHEEL;
-        packet.ButtonData=(USHORT)FilterScaleWheel(wheel,d->flipWheel);
+    if (wheel) {
+        LONG scaled = FilterScaleWheel(wheel);
+        packet.ButtonFlags |= MOUSE_WHEEL;
+        packet.ButtonData = (USHORT)(SHORT)max(-32768, min(32767, scaled));
     }
-    if(packet.ButtonFlags || packet.LastX || packet.LastY || packet.Flags)FilterDeliver(d,&packet,&packet+1);
-    if(horizontal) {
-        RtlZeroMemory(&packet,sizeof(packet));
-        packet.ButtonFlags=MOUSE_HWHEEL;
-        packet.ButtonData=(USHORT)FilterScaleWheel(horizontal,d->flipHorizontal);
-        FilterDeliver(d,&packet,&packet+1);
-    }
+    if (packet.ButtonFlags || packet.LastX || packet.LastY || absolute) FilterDeliver(d, &packet, &packet + 1);
+    if(horizontal) { RtlZeroMemory(&packet,sizeof(packet));packet.ButtonFlags=MOUSE_HWHEEL;packet.ButtonData=(USHORT)(SHORT)max(-32768,min(32767,FilterScaleWheel(horizontal)));FilterDeliver(d,&packet,&packet+1); }
     d->buttons = mapped;
 }
 
-static void FilterReaderReady(DEVICE_CONTEXT* d) {
-    WdfWaitLockAcquire(gGate,NULL);
-    if(!d->readerReady && !d->stop) {
-        d->readerReady=TRUE;
-        IcDeviceReadyLocked(d);
+static void FilterReadThread(PVOID context) {
+    DEVICE_CONTEXT* d=context;NTSTATUS status;ULONG_PTR received;ULONG retryMs=10;
+    while(!InterlockedCompareExchange(&d->stop,0,0)) {
+        if(d->keyboard)FilterRepeat(d);
+        received=0;status=FilterRead(d,&received);
+        if(d->stop)break;
+        if(status==STATUS_DEVICE_NOT_CONNECTED || status==STATUS_DEVICE_REMOVED || status==STATUS_NO_SUCH_DEVICE || status==STATUS_DELETE_PENDING)break;
+        // A lower target may complete immediately with CANCELLED/TIMEOUT or a
+        // malformed length. Never spin resubmitting these responses. Shutdown
+        // interrupts the exceptional backoff immediately; healthy reads do not wait.
+        if(!NT_SUCCESS(status) || received!=d->caps.InputReportByteLength) {
+            LARGE_INTEGER delay;delay.QuadPart=-(LONGLONG)retryMs*10000;
+            if(KeWaitForSingleObject(&d->stopEvent,Executive,KernelMode,FALSE,&delay)==STATUS_WAIT_0)break;
+            retryMs=min(retryMs*2,250u);continue;
+        }
+        retryMs=10;
+        if(d->keyboard)FilterKeyboard(d);else FilterMouse(d);
     }
-    WdfWaitLockRelease(gGate);
-}
-
-static void FilterReaderOffline(DEVICE_CONTEXT* d) {
-    BOOLEAN wasReady;
-    WdfWaitLockAcquire(gGate,NULL);
-    wasReady=d->readerReady;
-    d->readerReady=FALSE;
-    WdfWaitLockRelease(gGate);
-    if(wasReady)IcDeviceStopping(d);
+    FilterSetStop(d,1);
+    IcDeviceStopping(d);
     RtlZeroMemory(d->keys,sizeof(d->keys));RtlZeroMemory(d->mapped,sizeof(d->mapped));
     RtlZeroMemory(d->keyCounts,sizeof(d->keyCounts));RtlZeroMemory(d->buttonReports,sizeof(d->buttonReports));
     RtlZeroMemory(d->buttonOwners,sizeof(d->buttonOwners));d->physicalButtons=0;
     if(d->keyReports)RtlZeroMemory(d->keyReports,256*32);
     d->buttons=0;d->repeatUsage=0;d->modifiers.ul=0;d->prefix=0;
-}
-
-static void FilterReadThread(PVOID context) {
-    DEVICE_CONTEXT* d=context;
-    ULONG retryMs=25,failures=0;
-    KeWaitForSingleObject(&d->readerStarted,Executive,KernelMode,FALSE,NULL);
-    while(!InterlockedCompareExchange(&d->stop,0,0)) {
-        NTSTATUS status;
-        ULONG_PTR received=0;
-        if(!d->readRequest) {
-            status=FilterPrepareReader(d->device);
-            InterlockedExchange(&d->readStatus,status);
-            if(!NT_SUCCESS(status)) {
-                if(FilterRetry(d,retryMs))break;
-                retryMs=min(retryMs*2,2000u);
-                continue;
-            }
-            (void)FilterReserveInputBuffers(d->device,d->hidFile);
-            if(d->keyboard) {
-                InterlockedExchange(&d->indicatorDirty,TRUE);
-                FilterApplyIndicators(d);
-            }
-        }
-        if(d->stop)break;
-        if(d->keyboard)FilterApplyIndicators(d);
-        status=FilterRead(d,&received);
-        if(d->stop)break;
-        if(NT_SUCCESS(status) && received!=d->caps.InputReportByteLength)status=STATUS_INVALID_BUFFER_SIZE;
-        InterlockedExchange(&d->readStatus,status);
-        if(!NT_SUCCESS(status)) {
-            // A transport may return disconnection while Windows is still
-            // powering the devnode. Honor stop, back off, then rebuild the
-            // request and parser if the same generation stays unhealthy.
-            if(++failures==4) {
-                FilterReaderOffline(d);
-                FilterFreeReader(d);
-                failures=0;
-            }
-            if(FilterRetry(d,retryMs))break;
-            retryMs=min(retryMs*2,2000u);
-            continue;
-        }
-        retryMs=25;
-        failures=0;
-        if(d->keyboard) {FilterRepeat(d);FilterKeyboard(d);}
-        else FilterMouse(d);
-    }
-    FilterReaderOffline(d);
-    FilterFreeReader(d);
     PsTerminateSystemThread(STATUS_SUCCESS);
 }
-
-static void FilterStartLocked(WDFDEVICE device) {
-    DEVICE_CONTEXT* d=FilterDevice(device);
-    HANDLE thread;
-    PETHREAD object=NULL;
-    NTSTATUS status;
-    OBJECT_ATTRIBUTES attributes;
-    // CREATE, CONNECT and the working-state transition can arrive in any order.
-    // Cleanup stops and joins this worker before releasing the borrowed HID file.
-    if(!d->powered || !d->hidFile || !d->connection.ClassService || d->thread)return;
-    KeClearEvent(&d->stopEvent);KeClearEvent(&d->maintenanceEvent);KeClearEvent(&d->readerStarted);
+static NTSTATUS FilterStartLocked(WDFDEVICE device) {
+    DEVICE_CONTEXT* d = FilterDevice(device); HANDLE thread; PETHREAD object=NULL;NTSTATUS status;
+    WdfWaitLockAcquire(gGate,NULL);IcTrialResumeLocked();WdfWaitLockRelease(gGate);
+    if(d->thread && d->stop)FilterStopLocked(device);
+    if (d->thread) return STATUS_SUCCESS;
+    if (!d->report || !d->hidFile || !d->connection.ClassService) return STATUS_SUCCESS;
+    KeClearEvent(&d->stopEvent);KeClearEvent(&d->maintenanceEvent);
     FilterSetStop(d,0);
-    InitializeObjectAttributes(&attributes,NULL,OBJ_KERNEL_HANDLE,NULL,NULL);
-    status=PsCreateSystemThread(&thread,THREAD_ALL_ACCESS,&attributes,NULL,NULL,FilterReadThread,d);
-    if(NT_SUCCESS(status)) {
-        status=ObReferenceObjectByHandle(thread,SYNCHRONIZE,*PsThreadType,KernelMode,(PVOID*)&object,NULL);
-        if(NT_SUCCESS(status)) {
-            WdfWaitLockAcquire(gGate,NULL);d->thread=object;WdfWaitLockRelease(gGate);
-        } else {
-            FilterSetStop(d,1);
-            KeSetEvent(&d->stopEvent,IO_NO_INCREMENT,FALSE);
-        }
-        KeSetEvent(&d->readerStarted,IO_NO_INCREMENT,FALSE);
-        if(!NT_SUCCESS(status))ZwWaitForSingleObject(thread,FALSE,NULL);
-        ZwClose(thread);
-    }
-    if(!NT_SUCCESS(status)) {
-        FilterSetStop(d,1);
-        InterlockedExchange(&d->readStatus,status);
-        WdfTimerStart(d->retryTimer,WDF_REL_TIMEOUT_IN_MS(500));
-    }
+    status = PsCreateSystemThread(&thread, THREAD_ALL_ACCESS, NULL, NULL, NULL, FilterReadThread, d);
+    if (!NT_SUCCESS(status)) { FilterSetStop(d,1);return status; }
+    status = ObReferenceObjectByHandle(thread, SYNCHRONIZE, *PsThreadType, KernelMode, (PVOID*)&object, NULL);
+    if (!NT_SUCCESS(status)) {
+        FilterSetStop(d,1);KeSetEvent(&d->stopEvent,IO_NO_INCREMENT,FALSE);
+        ZwWaitForSingleObject(thread, FALSE, NULL);
+    } else { WdfWaitLockAcquire(gGate,NULL);d->thread=object;IcDeviceReadyLocked(d);WdfWaitLockRelease(gGate); }
+    ZwClose(thread); return status;
 }
-
 static void FilterStopLocked(WDFDEVICE device) {
-    DEVICE_CONTEXT* d=FilterDevice(device);
+    DEVICE_CONTEXT* d = FilterDevice(device);
     FilterSetStop(d,1);
-    WdfTimerStop(d->retryTimer,FALSE);
-    if(d->thread) {
+    if (d->thread) {
         KeSetEvent(&d->stopEvent,IO_NO_INCREMENT,FALSE);
-        KeWaitForSingleObject(d->thread,Executive,KernelMode,FALSE,NULL);
-        WdfWaitLockAcquire(gGate,NULL);
-        ObDereferenceObject(d->thread);d->thread=NULL;
-        WdfWaitLockRelease(gGate);
+        KeWaitForSingleObject(d->thread, Executive, KernelMode, FALSE, NULL);
+        WdfWaitLockAcquire(gGate,NULL);ObDereferenceObject(d->thread);d->thread=NULL;WdfWaitLockRelease(gGate);
     }
 }
-
-static EVT_WDF_TIMER FilterRetryStart;
-static VOID FilterRetryStart(WDFTIMER timer) {
-    WDFDEVICE device=(WDFDEVICE)WdfTimerGetParentObject(timer);
-    DEVICE_CONTEXT* d=FilterDevice(device);
-    WdfWaitLockAcquire(d->stateLock,NULL);
-    FilterStartLocked(device);
-    WdfWaitLockRelease(d->stateLock);
-}
-
-NTSTATUS FilterInitialize(WDFDEVICE device,BOOLEAN keyboard) {
-    DEVICE_CONTEXT* d=FilterDevice(device);
-    WDF_TIMER_CONFIG timer;
-    WDF_OBJECT_ATTRIBUTES attributes;
-    d->keyboard=keyboard;
-    d->info.type=keyboard?IC_TYPE_KEYBOARD:IC_TYPE_MOUSE;
-    d->info.instance_token=d->id;
-    d->typematic.Rate=30;
-    d->typematic.Delay=500;
-    d->stop=1;
-    d->readStatus=STATUS_DEVICE_NOT_READY;
-    KeInitializeEvent(&d->readDone,SynchronizationEvent,FALSE);
-    KeInitializeEvent(&d->readerStarted,NotificationEvent,FALSE);
-    KeInitializeEvent(&d->stopEvent,NotificationEvent,FALSE);
-    KeInitializeEvent(&d->maintenanceEvent,SynchronizationEvent,FALSE);
-    WDF_TIMER_CONFIG_INIT(&timer,FilterRetryStart);
-    timer.AutomaticSerialization=FALSE;
-    WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    attributes.ParentObject=device;
-    attributes.ExecutionLevel=WdfExecutionLevelPassive;
-    return WdfTimerCreate(&timer,&attributes,&d->retryTimer);
-}
-
-NTSTATUS FilterPrepare(WDFDEVICE device,WDFCMRESLIST raw,WDFCMRESLIST translated) {
-    UNREFERENCED_PARAMETER(raw);
-    UNREFERENCED_PARAMETER(translated);
-    return IcRegister(FilterDevice(device));
-}
-
-NTSTATUS FilterStart(WDFDEVICE device) {
-    DEVICE_CONTEXT* d=FilterDevice(device);
-    WdfWaitLockAcquire(d->stateLock,NULL);
-    d->powered=TRUE;
-    FilterStartLocked(device);
-    WdfWaitLockRelease(d->stateLock);
-    return STATUS_SUCCESS;
-}
-
-void FilterStop(WDFDEVICE device) {
-    DEVICE_CONTEXT* d=FilterDevice(device);
-    WdfWaitLockAcquire(d->stateLock,NULL);
-    d->powered=FALSE;
-    FilterStopLocked(device);
-    WdfWaitLockRelease(d->stateLock);
-}
-
-NTSTATUS FilterSuspend(WDFDEVICE device) {FilterStop(device);return STATUS_SUCCESS;}
-NTSTATUS FilterRelease(WDFDEVICE device,WDFCMRESLIST resources) {
-    UNREFERENCED_PARAMETER(resources);
-    DEVICE_CONTEXT* d=FilterDevice(device);
-    WdfWaitLockAcquire(d->stateLock,NULL);
-    d->powered=FALSE;
-    FilterStopLocked(device);
-    FilterCloseHid(d);
+NTSTATUS FilterStart(WDFDEVICE device) { DEVICE_CONTEXT* d=FilterDevice(device);NTSTATUS status;WdfWaitLockAcquire(d->stateLock,NULL);status=FilterStartLocked(device);WdfWaitLockRelease(d->stateLock);return status; }
+void FilterStop(WDFDEVICE device) { DEVICE_CONTEXT* d=FilterDevice(device);WdfWaitLockAcquire(d->stateLock,NULL);FilterStopLocked(device);WdfWaitLockRelease(d->stateLock); }
+NTSTATUS FilterSuspend(WDFDEVICE device) { FilterStop(device); return STATUS_SUCCESS; }
+NTSTATUS FilterRelease(WDFDEVICE device, WDFCMRESLIST resources) {
+    DEVICE_CONTEXT* d = FilterDevice(device); UNREFERENCED_PARAMETER(resources);
+    WdfWaitLockAcquire(d->stateLock,NULL);FilterStopLocked(device);
     IcUnregister(d);
-    WdfWaitLockRelease(d->stateLock);
-    return STATUS_SUCCESS;
+    FilterCloseHid(d);
+    if(d->readRequest) { WdfObjectDelete(d->readRequest);d->readRequest=NULL;d->readMemory=NULL; }
+    if(d->values) { ExFreePoolWithTag(d->values,FILTER_TAG);d->values=NULL;d->valueCount=0; }
+    if(d->keyReports) { ExFreePoolWithTag(d->keyReports,FILTER_TAG);d->keyReports=NULL; }
+    if (d->report) { ExFreePoolWithTag(d->report, FILTER_TAG); d->report = NULL; }
+    if (d->preparsed) { ExFreePoolWithTag(d->preparsed, FILTER_TAG); d->preparsed = NULL; }
+    WdfWaitLockRelease(d->stateLock);return STATUS_SUCCESS;
 }
-
 static NTSTATUS FilterIndicators(DEVICE_CONTEXT* d,USHORT flags) {
     PHIDP_BUTTON_CAPS caps;PUCHAR report;USHORT count=d->caps.NumberOutputButtonCaps;const ULONG capacity=count;ULONG i;
     UCHAR done[256]={0};NTSTATUS status=STATUS_SUCCESS;
+    d->indicators=flags;
     if(!d->hidFile || !d->preparsed || !count || !d->caps.OutputReportByteLength)return STATUS_SUCCESS;
     if(!capacity || capacity>512 || d->caps.OutputReportByteLength>4096)return STATUS_NOT_SUPPORTED;
     caps=FilterAllocateButtons(capacity);
@@ -638,11 +484,6 @@ end:
     if(caps)ExFreePoolWithTag(caps,FILTER_TAG);if(report)ExFreePoolWithTag(report,FILTER_TAG);
     return status;
 }
-static void FilterApplyIndicators(DEVICE_CONTEXT* d) {
-    if(InterlockedExchange(&d->indicatorDirty,FALSE))
-        (void)FilterIndicators(d,(USHORT)InterlockedCompareExchange(&d->indicators,0,0));
-}
-
 void FilterInternal(WDFQUEUE queue, WDFREQUEST request, size_t outSize, size_t inSize, ULONG code) {
     DEVICE_CONTEXT* d = FilterDevice(WdfIoQueueGetDevice(queue)); PVOID buffer;
     NTSTATUS status = STATUS_NOT_SUPPORTED; size_t bytes = 0;
@@ -653,16 +494,22 @@ void FilterInternal(WDFQUEUE queue, WDFREQUEST request, size_t outSize, size_t i
     }
     WdfWaitLockAcquire(d->stateLock,NULL);
     if (code == IOCTL_INTERNAL_KEYBOARD_CONNECT || code == IOCTL_INTERNAL_MOUSE_CONNECT) {
-        status=WdfRequestRetrieveInputBuffer(request,sizeof(CONNECT_DATA),&buffer,NULL);
-        if(NT_SUCCESS(status)) {
-            const CONNECT_DATA* incoming=buffer;
-            if(!incoming->ClassService || !incoming->ClassDeviceObject)status=STATUS_INVALID_PARAMETER;
-            else if(d->connection.ClassService &&
-                (d->connection.ClassService!=incoming->ClassService ||
-                 d->connection.ClassDeviceObject!=incoming->ClassDeviceObject))status=STATUS_SHARING_VIOLATION;
-            else {
-                WdfWaitLockAcquire(gGate,NULL);d->connection=*incoming;WdfWaitLockRelease(gGate);
-                FilterStartLocked(d->device);
+        if (d->connection.ClassService) status = STATUS_SHARING_VIOLATION;
+        else {
+            status = WdfRequestRetrieveInputBuffer(request, sizeof(CONNECT_DATA), &buffer, NULL);
+            if (NT_SUCCESS(status)) {
+                FilterStopLocked(d->device);
+                if(!((PCONNECT_DATA)buffer)->ClassService || !((PCONNECT_DATA)buffer)->ClassDeviceObject) { status=STATUS_INVALID_PARAMETER; }
+                else {
+                WdfWaitLockAcquire(gGate,NULL);d->connection=*(PCONNECT_DATA)buffer;WdfWaitLockRelease(gGate);
+                status = d->report ? FilterStartLocked(d->device) : STATUS_SUCCESS;
+                if(!NT_SUCCESS(status)) {
+                    // A failed CONNECT leaves ownership with the class driver.
+                    // Start has joined any partially created reader; do not keep
+                    // a callback/device pointer the caller may now release.
+                    WdfWaitLockAcquire(gGate,NULL);RtlZeroMemory(&d->connection,sizeof(d->connection));WdfWaitLockRelease(gGate);
+                }
+                }
             }
         }
     } else if (code == IOCTL_INTERNAL_KEYBOARD_DISCONNECT || code == IOCTL_INTERNAL_MOUSE_DISCONNECT) {
@@ -687,14 +534,10 @@ void FilterInternal(WDFQUEUE queue, WDFREQUEST request, size_t outSize, size_t i
         }
     } else if(code==IOCTL_KEYBOARD_QUERY_INDICATORS && d->keyboard) {
         status=WdfRequestRetrieveOutputBuffer(request,sizeof(KEYBOARD_INDICATOR_PARAMETERS),&buffer,NULL);
-        if(NT_SUCCESS(status)) { PKEYBOARD_INDICATOR_PARAMETERS p=buffer;p->UnitId=0;p->LedFlags=(USHORT)InterlockedCompareExchange(&d->indicators,0,0);bytes=sizeof(*p); }
+        if(NT_SUCCESS(status)) { PKEYBOARD_INDICATOR_PARAMETERS p=buffer;p->UnitId=0;p->LedFlags=d->indicators;bytes=sizeof(*p); }
     } else if(code==IOCTL_KEYBOARD_SET_INDICATORS && d->keyboard) {
         status=WdfRequestRetrieveInputBuffer(request,sizeof(KEYBOARD_INDICATOR_PARAMETERS),&buffer,NULL);
-        if(NT_SUCCESS(status)) {
-            InterlockedExchange(&d->indicators,((PKEYBOARD_INDICATOR_PARAMETERS)buffer)->LedFlags);
-            InterlockedExchange(&d->indicatorDirty,TRUE);
-            KeSetEvent(&d->maintenanceEvent,IO_NO_INCREMENT,FALSE);
-        }
+        if(NT_SUCCESS(status))status=FilterIndicators(d,((PKEYBOARD_INDICATOR_PARAMETERS)buffer)->LedFlags);
     } else if(code==IOCTL_KEYBOARD_QUERY_INDICATOR_TRANSLATION && d->keyboard) {
         const ULONG length=FIELD_OFFSET(KEYBOARD_INDICATOR_TRANSLATION,IndicatorList)+3*sizeof(INDICATOR_LIST);
         status=WdfRequestRetrieveOutputBuffer(request,length,&buffer,NULL);

@@ -9,7 +9,7 @@ Keep using a Windows program made for the original Interception keyboard and mou
 
 **64-bit Windows 10 version 1709 or later, or Windows 11.**
 
-1. Download and extract [Interception-V2.zip](https://github.com/TitanCSA/Interception-V2/releases/latest/download/Interception-V2.zip).
+1. Download and extract [Interception-V2.zip](https://github.com/TitanCSA/Interception-V2/releases/download/v2.0.0/Interception-V2.zip).
 2. Follow [the installation steps](#install). Remove an older Interception driver before installing this one.
 3. Open the program you want to use and check that its keyboard or mouse works.
 <!-- simple-start:end -->
@@ -57,12 +57,6 @@ To uninstall:
 ```
 
 Restart if requested to finish restoring Windows drivers and removing in-use packages. Running the installer without arguments displays its help. It refuses conflicting editions rather than overwriting their endpoints.
-
-## HID recovery and mouse settings
-
-The 2.0.0.2 demo retries HID reader initialization after temporary startup and transport failures. The mouse mapper reads the Windows settings `FlipFlopWheel`, `FlipFlopHScroll`, and `ForceAbsolute` independently for each device.
-
-The original C API is available to both x86 and x64 applications. The seven Oblitum samples were exercised using the original DLLs on the signed 2.0.0.0 driver. The physical Ctrl+Alt+Delete chord still revokes capture, including when `cadstop` is running.
 
 ## Use an existing application
 
