@@ -202,6 +202,8 @@ NTSTATUS FilterAdd(WDFDRIVER driver, PWDFDEVICE_INIT init) {
     IcCacheDeviceInstance(device,d->instance);
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);attributes.ParentObject=device;
     status=WdfWaitLockCreate(&attributes,&d->stateLock);if(!NT_SUCCESS(status))return status;
+    status=FilterInitialize(device,(BOOLEAN)(WdfDeviceWdmGetDeviceObject(device)->DeviceType==FILE_DEVICE_KEYBOARD));
+    if(!NT_SUCCESS(status))return status;
     WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queue, WdfIoQueueDispatchSequential);
     queue.EvtIoInternalDeviceControl = FilterInternal;
     queue.EvtIoDeviceControl = FilterInternal;
