@@ -3,7 +3,7 @@
 <!-- simple-start:start -->
 Keep using a Windows program made for the original Interception keyboard and mouse library.
 
-[First steps](#first-steps) · [Develop](#sdk-and-packages) · [Maintain](https://github.com/TitanCSA/sdk-packages/blob/main/CONTRIBUTING.md)
+[Guide en français](https://titancsa.github.io/fr/migrer-interception-v2/) · [SDK](#sdk-and-packages) · [Full version on Discord](https://titancsa.github.io/about/evidence/#release-contact)
 
 ## First steps
 
@@ -160,4 +160,6 @@ Use the software only on devices you own or are authorized to manage. It is prov
 ## SDK and packages
 
 Choose a language in the [SDK and package guide](https://github.com/TitanCSA/sdk-packages/tree/main/projects/Interception-V2#readme) for exact install commands and examples. If your example requires a driver or app, install it separately.
+
+[First SDK check](https://titancsa.github.io/guides/interception-v2-migration/#first-sdk-check) · [Python example](https://titancsa.github.io/guides/interception-v2-migration/#python-sdk) · [Package maintenance](https://github.com/TitanCSA/sdk-packages/blob/main/CONTRIBUTING.md)
 <!-- central-sdk-packages:end -->
